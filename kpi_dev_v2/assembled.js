@@ -26,6 +26,8 @@ const DEPARTMENTS=[
  {name:'Finance',head:'Nimmi',memberIds:['ravira']},
  {name:'Leadership & shared',head:'Nimmi',memberIds:['nimmi'],shared:true}
 ];
+const APEIRO_DEPARTMENTS=[{name:'Operations',head:'—',memberIds:['sumudu','heshani','steve']}];
+function departmentsFor(company){return company==='apeiro'?APEIRO_DEPARTMENTS:DEPARTMENTS;}
 // Review groups use the role structure supplied by the user. They are not
 // claims about a separate "unit" field in the source spreadsheet.
 const UNITS={
@@ -322,12 +324,12 @@ function openCompany(company){
  document.body.dataset.company=company;$('landing').classList.remove('active');$('company-page').classList.add('active');
  $('company-logo').src=LOGOS[company];$('company-logo').alt=COMPANIES[company].name+' logo';$('company-logo').classList.toggle('xguard',company==='xguard');
  $('top-company').textContent=COMPANIES[company].name;$('heading-company').textContent=COMPANIES[company].name;$('company-subtitle').textContent=COMPANIES[company].subtitle;
- $('switch-company').textContent=company==='apeiro'?'Switch to X GUARD ↗':'Switch to APEIRO ↗';$('department-tab').hidden=company==='apeiro';
+ $('switch-company').textContent=company==='apeiro'?'Switch to X GUARD ↗':'Switch to APEIRO ↗';$('department-tab').hidden=false;
  $('kpi-search').value='';$('status-select').value='all';renderAll();window.scrollTo(0,0);
 }
 function switchCompany(){openCompany(state.currentCompany==='apeiro'?'xguard':'apeiro');}
 function showTab(tab){
- if(tab==='departments'&&state.currentCompany==='apeiro')tab='overview';state.activeTab=tab;
+ state.activeTab=tab;
  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+tab));
  if(tab==='reports')renderReports();
@@ -339,7 +341,7 @@ function resetFilters(){state.selectedDepartment='all';state.selectedEmployee='a
 function changeUnit(unit){state.selectedUnit=unit;renderUnits();}
 function selectUnit(unit){state.selectedUnit=state.selectedUnit===unit?'all':unit;renderUnits();}
 function focusPerson(id){state.selectedEmployee=id;state.tableSearch='';state.tableStatus='all';$('kpi-search').value='';$('status-select').value='all';renderAll();showTab('people');}
-function focusDepartment(name){state.selectedDepartment=name;state.selectedEmployee='all';state.selectedUnit='all';renderAll();showTab('people');}
+function focusDepartment(name){state.selectedDepartment=state.selectedDepartment===name?'all':name;state.selectedEmployee='all';state.selectedUnit='all';renderAll();}
 function changeSearch(value){state.tableSearch=value;renderKpiTable();}
 function changeTableStatus(value){state.tableStatus=value;renderKpiTable();}
 function renderLandingStatus(){
@@ -351,9 +353,8 @@ function updateControls(){
  const company=state.currentCompany,periods=availablePeriods(company),periodSelect=$('period-select');
  if(!periods.length){periodSelect.disabled=true;periodSelect.innerHTML=`<option value="">${state.refreshing?'Loading available months…':'No months loaded'}</option>`;state.periodByCompany[company]=null;}
  else{periodSelect.disabled=false;if(!periods.includes(state.periodByCompany[company]))state.periodByCompany[company]=periods[0];periodSelect.innerHTML=periods.map(p=>`<option value="${esc(p)}">${esc(periodLabel(p))}</option>`).join('');periodSelect.value=state.periodByCompany[company];}
- const deptField=$('dept-filter-field'),deptSelect=$('dept-select');deptField.hidden=company==='apeiro';
- if(company==='apeiro')state.selectedDepartment='all';
- const depts=company==='xguard'?DEPARTMENTS:[];
+ const deptField=$('dept-filter-field'),deptSelect=$('dept-select');deptField.hidden=false;
+ const depts=departmentsFor(company);
  if(state.selectedDepartment!=='all'&&!depts.some(d=>d.name===state.selectedDepartment))state.selectedDepartment='all';
  deptSelect.innerHTML='<option value="all">All departments</option>'+depts.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');deptSelect.value=state.selectedDepartment;
  const people=eligiblePeople(company,false);if(state.selectedEmployee!=='all'&&!people.some(e=>e.id===state.selectedEmployee))state.selectedEmployee='all';
@@ -489,19 +490,31 @@ function exportCsv(){
  const output='\uFEFF'+[head,...data].map(row=>row.map(csvCell).join(',')).join('\r\n');
  const blob=new Blob([output],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`${state.currentCompany}-kpi-${selectedPeriod()||'records'}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function visibleDepartments(){
- if(state.currentCompany!=='xguard')return [];
- const person=state.selectedEmployee==='all'?null:byId(state.selectedEmployee);
- return DEPARTMENTS.filter(d=>(state.selectedDepartment==='all'||d.name===state.selectedDepartment)&&(!person||ownership(person)===d.name));
+// Colors represent assessment status, not arbitrary percentage thresholds.
+function departmentKpiColor(r){return r.duplicate||r.statusConflict||r.scoreConflict?'review':r.status==='met'?'met':r.status==='not-met'?'miss':'unknown';}
+function departmentAssessment(d,period){
+ const rows=departmentRows(d.name,period),s=summarize(rows),owners=peopleFor(state.currentCompany).filter(e=>ownership(e)===d.name&&(state.selectedEmployee==='all'||state.selectedEmployee===e.id));
+ const incomplete=owners.some(e=>state.source[e.id].status!=='live'||!rows.some(r=>r.employeeId===e.id))||s.unassessed>0||s.duplicates>0||s.conflicts>0;
+ if(!s.assessed)return {color:incomplete&&s.rows?'review':'unknown',label:incomplete&&s.rows?'Needs review':'No assessed KPIs'};
+ if(s.miss)return {color:s.met||incomplete?'review':'miss',label:s.met||incomplete?'Mixed / needs attention':'All assessed not met'};
+ return incomplete?{color:'review',label:'Met, with incomplete data'}:{color:'met',label:'All assessed met'};
 }
-function departmentRows(name,period){return scopedRows('xguard',period).filter(r=>ownership(byId(r.employeeId))===name);}
+function visibleDepartments(){
+ const person=state.selectedEmployee==='all'?null:byId(state.selectedEmployee);
+ return departmentsFor(state.currentCompany).filter(d=>(state.selectedDepartment==='all'||d.name===state.selectedDepartment)&&(!person||ownership(person)===d.name));
+}
+function departmentRows(name,period){return scopedRows(state.currentCompany,period).filter(r=>ownership(byId(r.employeeId))===name);}
 function renderDepartments(period){
- if(state.currentCompany!=='xguard')return;
  const depts=visibleDepartments(),stats=depts.map(d=>({d,s:summarize(departmentRows(d.name,period))}));
- $('department-cards').innerHTML=stats.map(({d,s})=>`<button class="review-card clickable" onclick="focusDepartment('${esc(d.name)}')"><div class="review-kicker">${d.shared?'Cross-department':'Department'}</div><h4>${esc(d.name)}</h4><div class="review-line">Head: ${esc(d.head)}<br>Roster: ${esc(d.memberIds.map(id=>byId(id)?.name).filter(Boolean).join(', '))}</div><div class="review-value">${pctText(s.avg)}</div><div class="review-foot">${s.rows} records · ${s.met}/${s.assessed} assessed met</div><div class="review-arrow">View records ↗</div></button>`).join('')||displayEmpty('No department matches this selection.');
+ $('department-cards').innerHTML=stats.map(({d,s})=>`<button class="review-card clickable dept-card-${departmentAssessment(d,period).color} ${state.selectedDepartment===d.name?'selected':''}" aria-pressed="${state.selectedDepartment===d.name}" onclick="focusDepartment('${esc(d.name)}')"><div class="review-kicker">${d.shared?'Cross-department':'Department'}</div><h4>${esc(d.name)}</h4><div class="review-line">Head: ${esc(d.head)}<br>Roster: ${esc(d.memberIds.map(id=>byId(id)?.name).filter(Boolean).join(', '))}</div><div class="review-value">${pctText(s.avg)}</div><div class="review-foot">${s.rows} records · ${s.met}/${s.assessed} assessed met</div><div class="department-assessment">${esc(departmentAssessment(d,period).label)}</div><div class="review-arrow">${state.selectedDepartment===d.name?'Show all departments':'Inspect KPIs ↗'}</div></button>`).join('')||displayEmpty('No department matches this selection.');
+ const detailRows=scopedRows(state.currentCompany,period),people=eligiblePeople(state.currentCompany,true),issues=people.filter(e=>['unavailable','stale','loading'].includes(state.source[e.id].status));
+ $('department-detail-scope').textContent=`${state.selectedDepartment==='all'?'All KPI ownership groups':state.selectedDepartment} · ${period?periodLabel(period):'No reporting period'} · ${state.selectedEmployee==='all'?'All employees':byId(state.selectedEmployee).name}`;
+ $('department-detail-count').textContent=`${detailRows.length} records`;
+ $('department-source-note').textContent=issues.length?`Source availability: ${issues.map(e=>e.name+' ('+state.source[e.id].status+')').join(', ')}. Missing data is not zero; stale data is from the last successful in-session load.`:'Only KPI records available in the employee sheets are shown. Department ownership is role-based, not a separate departmental dataset.';
+ $('department-kpi-table').innerHTML=detailRows.length?detailRows.map(r=>{const e=byId(r.employeeId);return `<tr class="dept-row-${departmentKpiColor(r)}"><td><strong>${esc(ownership(e))}</strong><div class="table-meta">${esc(e.name)}</div></td><td class="kpi-text"><strong>${esc(r.kpi)}</strong>${r.description?`<div class="table-meta">${esc(r.description)}</div>`:''}${r.duplicate?'<div class="table-review">Duplicate month · excluded from totals</div>':''}</td><td class="target-cell">${esc(r.target||'—')}</td><td>${esc(r.actual||'—')}</td><td>${scoreHtml(r)}</td><td>${statusHtml(r)}</td><td class="notes-cell">${r.notes?`<details><summary>View notes</summary><div class="note-content">${esc(r.notes)}</div></details>`:'—'}</td></tr>`;}).join(''):`<tr><td colspan="7">${state.refreshing?'Loading KPI data…':'No KPI records available for this selection.'}</td></tr>`;
  $('department-bars').innerHTML=renderBars(stats.map(({d,s})=>({label:d.name,value:s.avg})));
  $('department-status').innerHTML=renderStacks(stats.map(({d,s})=>({label:d.name,s})));
- const periods=monthList('xguard');
+ const periods=monthList(state.currentCompany);
  $('department-heatmap').innerHTML=periods.length&&depts.length?`<table class="matrix-table"><thead><tr><th>KPI ownership</th>${periods.map(p=>`<th>${esc(periodShort(p))}</th>`).join('')}</tr></thead><tbody>${depts.map(d=>`<tr><td><strong>${esc(d.name)}</strong></td>${periods.map(p=>{const s=summarize(departmentRows(d.name,p));return `<td><span class="heat ${s.avg===null?'empty':''}" title="${esc(`${periodLabel(p)} · ${s.scored} usable numeric results`)}">${pctText(s.avg)}</span></td>`;}).join('')}</tr>`).join('')}</tbody></table>`:displayEmpty('No history is available.');
  $('department-table').innerHTML=stats.length?stats.map(({d,s})=>`<tr><td><strong>${esc(d.name)}</strong>${d.shared?'<div class="table-meta">Cross-department leadership</div>':''}</td><td>${esc(d.head)}</td><td>${d.memberIds.length}<div class="table-meta">${esc(d.memberIds.map(id=>byId(id)?.name).filter(Boolean).join(', '))}</div></td><td>${s.rows}</td><td>${pctText(s.avg)}</td><td>${s.met} / ${s.assessed}</td><td>${s.unassessed}</td></tr>`).join(''):'<tr><td colspan="7">No departments in scope.</td></tr>';
 }

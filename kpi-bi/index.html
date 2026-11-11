@@ -34,6 +34,19 @@
 @media(max-width:380px){.company-lockup{gap:7px}.lockup-copy small{display:none}.lockup-copy strong{font-size:.75rem;max-width:67px;overflow:hidden;text-overflow:ellipsis}}
 @media(max-width:380px){.home-btn{width:36px;height:36px}.company-logo{width:38px;height:38px}.topbar .icon-btn{padding:9px 10px}}
 
+/* Department assessment colours supplement text labels, never replace them. */
+.department-legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;color:#46566c;font-size:.7rem;font-weight:800}
+#department-cards .review-card{border-left:5px solid #718096}
+#department-cards .dept-card-met{border-left-color:#17805b;background:#f3fbf6}
+#department-cards .dept-card-miss{border-left-color:#bd3b37;background:#fff6f5}
+#department-cards .dept-card-review{border-left-color:#a86c00;background:#fffaee}
+.department-assessment{font-size:.65rem;font-weight:850;color:#536479}
+.dept-card-met .department-assessment{color:#126746}.dept-card-miss .department-assessment{color:#9e302d}.dept-card-review .department-assessment{color:#845300}
+#department-kpi-table tr td:first-child{border-left:4px solid #718096}
+#department-kpi-table tr.dept-row-met td:first-child{border-left-color:#17805b;background:#f3fbf6}
+#department-kpi-table tr.dept-row-miss td:first-child{border-left-color:#bd3b37;background:#fff6f5}
+#department-kpi-table tr.dept-row-review td:first-child{border-left-color:#a86c00;background:#fffaee}
+
 </style>
 </head>
 <body>
@@ -128,13 +141,15 @@
 
     <section class="view" id="view-departments">
       <div class="view-header"><div><div class="eyebrow">03 / Departmental review</div><h2>Departments</h2><p>Department performance, ownership, coverage and history.</p></div><div class="view-tools"><button class="small-action" onclick="window.print()">Print / save PDF</button></div></div>
-      <div class="callout gold">The department KPI view uses single ownership to avoid double counting: Uthpala’s recruitment KPIs are assigned to HR &amp; Recruitment; Nimmi’s cross-department leadership KPIs are shown separately. Department rosters may overlap. A dash means no usable numeric percentage, not zero; status-only results still appear in the status chart.</div>
+      <div class="callout gold">Select a department card or use the filters above to inspect its KPIs. The department KPI view uses single ownership to avoid double counting: Uthpala’s recruitment KPIs are assigned to HR &amp; Recruitment; Nimmi’s cross-department leadership KPIs are shown separately. Department rosters may overlap. A dash means no usable numeric percentage, not zero; status-only results still appear in the status chart.</div>
+      <div class="department-legend" aria-label="Assessment colour key"><span><i class="legend-dot" style="background:#17805b"></i>Met</span><span><i class="legend-dot" style="background:#bd3b37"></i>Not met</span><span><i class="legend-dot" style="background:#a86c00"></i>Mixed, incomplete or review</span><span><i class="legend-dot" style="background:#718096"></i>Not assessed / no data</span></div><p class="chart-note">KPI rows use their assessment status, not percentage thresholds. Cards are green only when all assessed KPIs are met and data is complete; mixed or incomplete results are amber. Conflicts and duplicates require review.</p>
       <div class="review-grid section-gap" id="department-cards"></div>
       <div class="analytics-grid section-gap">
         <article class="card span-6"><div class="card-top"><div><h3>Department recorded %</h3><p>Average of available numeric KPI results.</p></div><span class="card-badge">Comparison</span></div><div id="department-bars"></div></article>
         <article class="card span-6"><div class="card-top"><div><h3>Department status mix</h3><p>Met, not met and unassessed KPI records.</p></div><span class="card-badge">Status</span></div><div id="department-status"></div></article>
         <article class="card span-12"><div class="card-top"><div><h3>Department performance by month</h3><p>Average recorded % by KPI ownership; “—” indicates no usable numeric results.</p></div><span class="card-badge">Heatmap</span></div><div class="matrix-wrap" id="department-heatmap"></div><p class="chart-note">Month labels may lack a year. The team and KPI mix can differ by month.</p></article>
       </div>
+      <div class="card section-gap"><div class="card-top"><div><h3>Department KPI details</h3><p id="department-detail-scope"></p></div><span class="card-badge" id="department-detail-count"></span></div><p class="chart-note" id="department-source-note"></p><div class="table-wrap"><table><thead><tr><th>Department / owner</th><th>KPI area / description</th><th>Target</th><th>Actual / result</th><th>Recorded %</th><th>Status</th><th>Notes</th></tr></thead><tbody id="department-kpi-table"></tbody></table></div><p class="chart-note">For search and CSV export, open the People &amp; KPIs tab with the same filters. Duplicate rows remain visible but are excluded from summaries.</p></div>
       <div class="card section-gap"><div class="card-top"><div><h3>Department review table</h3><p>Roster membership is separate from KPI ownership.</p></div><span class="card-badge">Summary</span></div><div class="table-wrap"><table><thead><tr><th>Department</th><th>Department head</th><th>Team members</th><th>KPI records</th><th>Recorded %</th><th>Met / assessed</th><th>Unassessed</th></tr></thead><tbody id="department-table"></tbody></table></div></div>
     </section>
 
@@ -228,6 +243,8 @@ const DEPARTMENTS=[
  {name:'Finance',head:'Nimmi',memberIds:['ravira']},
  {name:'Leadership & shared',head:'Nimmi',memberIds:['nimmi'],shared:true}
 ];
+const APEIRO_DEPARTMENTS=[{name:'Operations',head:'—',memberIds:['sumudu','heshani','steve']}];
+function departmentsFor(company){return company==='apeiro'?APEIRO_DEPARTMENTS:DEPARTMENTS;}
 // Review groups use the role structure supplied by the user. They are not
 // claims about a separate "unit" field in the source spreadsheet.
 const UNITS={
@@ -524,12 +541,12 @@ function openCompany(company){
  document.body.dataset.company=company;$('landing').classList.remove('active');$('company-page').classList.add('active');
  $('company-logo').src=LOGOS[company];$('company-logo').alt=COMPANIES[company].name+' logo';$('company-logo').classList.toggle('xguard',company==='xguard');
  $('top-company').textContent=COMPANIES[company].name;$('heading-company').textContent=COMPANIES[company].name;$('company-subtitle').textContent=COMPANIES[company].subtitle;
- $('switch-company').textContent=company==='apeiro'?'Switch to X GUARD ↗':'Switch to APEIRO ↗';$('department-tab').hidden=company==='apeiro';
+ $('switch-company').textContent=company==='apeiro'?'Switch to X GUARD ↗':'Switch to APEIRO ↗';$('department-tab').hidden=false;
  $('kpi-search').value='';$('status-select').value='all';renderAll();window.scrollTo(0,0);
 }
 function switchCompany(){openCompany(state.currentCompany==='apeiro'?'xguard':'apeiro');}
 function showTab(tab){
- if(tab==='departments'&&state.currentCompany==='apeiro')tab='overview';state.activeTab=tab;
+ state.activeTab=tab;
  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+tab));
  if(tab==='reports')renderReports();
@@ -541,7 +558,7 @@ function resetFilters(){state.selectedDepartment='all';state.selectedEmployee='a
 function changeUnit(unit){state.selectedUnit=unit;renderUnits();}
 function selectUnit(unit){state.selectedUnit=state.selectedUnit===unit?'all':unit;renderUnits();}
 function focusPerson(id){state.selectedEmployee=id;state.tableSearch='';state.tableStatus='all';$('kpi-search').value='';$('status-select').value='all';renderAll();showTab('people');}
-function focusDepartment(name){state.selectedDepartment=name;state.selectedEmployee='all';state.selectedUnit='all';renderAll();showTab('people');}
+function focusDepartment(name){state.selectedDepartment=state.selectedDepartment===name?'all':name;state.selectedEmployee='all';state.selectedUnit='all';renderAll();}
 function changeSearch(value){state.tableSearch=value;renderKpiTable();}
 function changeTableStatus(value){state.tableStatus=value;renderKpiTable();}
 function renderLandingStatus(){
@@ -553,9 +570,8 @@ function updateControls(){
  const company=state.currentCompany,periods=availablePeriods(company),periodSelect=$('period-select');
  if(!periods.length){periodSelect.disabled=true;periodSelect.innerHTML=`<option value="">${state.refreshing?'Loading available months…':'No months loaded'}</option>`;state.periodByCompany[company]=null;}
  else{periodSelect.disabled=false;if(!periods.includes(state.periodByCompany[company]))state.periodByCompany[company]=periods[0];periodSelect.innerHTML=periods.map(p=>`<option value="${esc(p)}">${esc(periodLabel(p))}</option>`).join('');periodSelect.value=state.periodByCompany[company];}
- const deptField=$('dept-filter-field'),deptSelect=$('dept-select');deptField.hidden=company==='apeiro';
- if(company==='apeiro')state.selectedDepartment='all';
- const depts=company==='xguard'?DEPARTMENTS:[];
+ const deptField=$('dept-filter-field'),deptSelect=$('dept-select');deptField.hidden=false;
+ const depts=departmentsFor(company);
  if(state.selectedDepartment!=='all'&&!depts.some(d=>d.name===state.selectedDepartment))state.selectedDepartment='all';
  deptSelect.innerHTML='<option value="all">All departments</option>'+depts.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');deptSelect.value=state.selectedDepartment;
  const people=eligiblePeople(company,false);if(state.selectedEmployee!=='all'&&!people.some(e=>e.id===state.selectedEmployee))state.selectedEmployee='all';
@@ -691,19 +707,31 @@ function exportCsv(){
  const output='\uFEFF'+[head,...data].map(row=>row.map(csvCell).join(',')).join('\r\n');
  const blob=new Blob([output],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`${state.currentCompany}-kpi-${selectedPeriod()||'records'}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function visibleDepartments(){
- if(state.currentCompany!=='xguard')return [];
- const person=state.selectedEmployee==='all'?null:byId(state.selectedEmployee);
- return DEPARTMENTS.filter(d=>(state.selectedDepartment==='all'||d.name===state.selectedDepartment)&&(!person||ownership(person)===d.name));
+// Colors represent assessment status, not arbitrary percentage thresholds.
+function departmentKpiColor(r){return r.duplicate||r.statusConflict||r.scoreConflict?'review':r.status==='met'?'met':r.status==='not-met'?'miss':'unknown';}
+function departmentAssessment(d,period){
+ const rows=departmentRows(d.name,period),s=summarize(rows),owners=peopleFor(state.currentCompany).filter(e=>ownership(e)===d.name&&(state.selectedEmployee==='all'||state.selectedEmployee===e.id));
+ const incomplete=owners.some(e=>state.source[e.id].status!=='live'||!rows.some(r=>r.employeeId===e.id))||s.unassessed>0||s.duplicates>0||s.conflicts>0;
+ if(!s.assessed)return {color:incomplete&&s.rows?'review':'unknown',label:incomplete&&s.rows?'Needs review':'No assessed KPIs'};
+ if(s.miss)return {color:s.met||incomplete?'review':'miss',label:s.met||incomplete?'Mixed / needs attention':'All assessed not met'};
+ return incomplete?{color:'review',label:'Met, with incomplete data'}:{color:'met',label:'All assessed met'};
 }
-function departmentRows(name,period){return scopedRows('xguard',period).filter(r=>ownership(byId(r.employeeId))===name);}
+function visibleDepartments(){
+ const person=state.selectedEmployee==='all'?null:byId(state.selectedEmployee);
+ return departmentsFor(state.currentCompany).filter(d=>(state.selectedDepartment==='all'||d.name===state.selectedDepartment)&&(!person||ownership(person)===d.name));
+}
+function departmentRows(name,period){return scopedRows(state.currentCompany,period).filter(r=>ownership(byId(r.employeeId))===name);}
 function renderDepartments(period){
- if(state.currentCompany!=='xguard')return;
  const depts=visibleDepartments(),stats=depts.map(d=>({d,s:summarize(departmentRows(d.name,period))}));
- $('department-cards').innerHTML=stats.map(({d,s})=>`<button class="review-card clickable" onclick="focusDepartment('${esc(d.name)}')"><div class="review-kicker">${d.shared?'Cross-department':'Department'}</div><h4>${esc(d.name)}</h4><div class="review-line">Head: ${esc(d.head)}<br>Roster: ${esc(d.memberIds.map(id=>byId(id)?.name).filter(Boolean).join(', '))}</div><div class="review-value">${pctText(s.avg)}</div><div class="review-foot">${s.rows} records · ${s.met}/${s.assessed} assessed met</div><div class="review-arrow">View records ↗</div></button>`).join('')||displayEmpty('No department matches this selection.');
+ $('department-cards').innerHTML=stats.map(({d,s})=>`<button class="review-card clickable dept-card-${departmentAssessment(d,period).color} ${state.selectedDepartment===d.name?'selected':''}" aria-pressed="${state.selectedDepartment===d.name}" onclick="focusDepartment('${esc(d.name)}')"><div class="review-kicker">${d.shared?'Cross-department':'Department'}</div><h4>${esc(d.name)}</h4><div class="review-line">Head: ${esc(d.head)}<br>Roster: ${esc(d.memberIds.map(id=>byId(id)?.name).filter(Boolean).join(', '))}</div><div class="review-value">${pctText(s.avg)}</div><div class="review-foot">${s.rows} records · ${s.met}/${s.assessed} assessed met</div><div class="department-assessment">${esc(departmentAssessment(d,period).label)}</div><div class="review-arrow">${state.selectedDepartment===d.name?'Show all departments':'Inspect KPIs ↗'}</div></button>`).join('')||displayEmpty('No department matches this selection.');
+ const detailRows=scopedRows(state.currentCompany,period),people=eligiblePeople(state.currentCompany,true),issues=people.filter(e=>['unavailable','stale','loading'].includes(state.source[e.id].status));
+ $('department-detail-scope').textContent=`${state.selectedDepartment==='all'?'All KPI ownership groups':state.selectedDepartment} · ${period?periodLabel(period):'No reporting period'} · ${state.selectedEmployee==='all'?'All employees':byId(state.selectedEmployee).name}`;
+ $('department-detail-count').textContent=`${detailRows.length} records`;
+ $('department-source-note').textContent=issues.length?`Source availability: ${issues.map(e=>e.name+' ('+state.source[e.id].status+')').join(', ')}. Missing data is not zero; stale data is from the last successful in-session load.`:'Only KPI records available in the employee sheets are shown. Department ownership is role-based, not a separate departmental dataset.';
+ $('department-kpi-table').innerHTML=detailRows.length?detailRows.map(r=>{const e=byId(r.employeeId);return `<tr class="dept-row-${departmentKpiColor(r)}"><td><strong>${esc(ownership(e))}</strong><div class="table-meta">${esc(e.name)}</div></td><td class="kpi-text"><strong>${esc(r.kpi)}</strong>${r.description?`<div class="table-meta">${esc(r.description)}</div>`:''}${r.duplicate?'<div class="table-review">Duplicate month · excluded from totals</div>':''}</td><td class="target-cell">${esc(r.target||'—')}</td><td>${esc(r.actual||'—')}</td><td>${scoreHtml(r)}</td><td>${statusHtml(r)}</td><td class="notes-cell">${r.notes?`<details><summary>View notes</summary><div class="note-content">${esc(r.notes)}</div></details>`:'—'}</td></tr>`;}).join(''):`<tr><td colspan="7">${state.refreshing?'Loading KPI data…':'No KPI records available for this selection.'}</td></tr>`;
  $('department-bars').innerHTML=renderBars(stats.map(({d,s})=>({label:d.name,value:s.avg})));
  $('department-status').innerHTML=renderStacks(stats.map(({d,s})=>({label:d.name,s})));
- const periods=monthList('xguard');
+ const periods=monthList(state.currentCompany);
  $('department-heatmap').innerHTML=periods.length&&depts.length?`<table class="matrix-table"><thead><tr><th>KPI ownership</th>${periods.map(p=>`<th>${esc(periodShort(p))}</th>`).join('')}</tr></thead><tbody>${depts.map(d=>`<tr><td><strong>${esc(d.name)}</strong></td>${periods.map(p=>{const s=summarize(departmentRows(d.name,p));return `<td><span class="heat ${s.avg===null?'empty':''}" title="${esc(`${periodLabel(p)} · ${s.scored} usable numeric results`)}">${pctText(s.avg)}</span></td>`;}).join('')}</tr>`).join('')}</tbody></table>`:displayEmpty('No history is available.');
  $('department-table').innerHTML=stats.length?stats.map(({d,s})=>`<tr><td><strong>${esc(d.name)}</strong>${d.shared?'<div class="table-meta">Cross-department leadership</div>':''}</td><td>${esc(d.head)}</td><td>${d.memberIds.length}<div class="table-meta">${esc(d.memberIds.map(id=>byId(id)?.name).filter(Boolean).join(', '))}</div></td><td>${s.rows}</td><td>${pctText(s.avg)}</td><td>${s.met} / ${s.assessed}</td><td>${s.unassessed}</td></tr>`).join(''):'<tr><td colspan="7">No departments in scope.</td></tr>';
 }
