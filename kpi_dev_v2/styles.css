@@ -39,3 +39,80 @@
 #department-kpi-table tr.dept-row-met td:first-child{border-left-color:#17805b;background:#f3fbf6}
 #department-kpi-table tr.dept-row-miss td:first-child{border-left-color:#bd3b37;background:#fff6f5}
 #department-kpi-table tr.dept-row-review td:first-child{border-left-color:#a86c00;background:#fffaee}
+
+/* Cinematic landing motion: content and company actions remain unchanged. */
+.landing{background:#f5f8fc}
+.landing-motion{position:absolute;inset:0;z-index:-2;overflow:hidden;pointer-events:none;background:linear-gradient(135deg,#e8edf6,#f8f4ec 55%,#c8d4e7)}
+.landing-video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.landing:before{z-index:-1;background:linear-gradient(90deg,rgba(249,251,255,.96) 0%,rgba(249,251,255,.88) 52%,rgba(249,251,255,.68) 100%);opacity:1;mask-image:none}
+.landing-kicker{border-radius:0;background:rgba(255,255,255,.65);backdrop-filter:blur(18px);animation:landing-wipe .7s cubic-bezier(.16,1,.3,1) .18s backwards}
+.landing h1 .landing-title-first{display:inline-block;color:inherit;animation:landing-rise .85s cubic-bezier(.16,1,.3,1) .26s backwards}
+.landing h1 .landing-title-accent{display:inline-block;position:relative;color:#6b7378;animation:landing-rise .85s cubic-bezier(.16,1,.3,1) .4s backwards}
+.landing-title-accent:before,.landing-title-accent:after{content:attr(data-text);position:absolute;inset:0;pointer-events:none;mask-image:linear-gradient(90deg,#000 0%,#000 calc(100% - 72px),transparent 100%);mask-size:0% 100%;mask-repeat:no-repeat;animation:landing-paint 1.05s cubic-bezier(.4,0,.2,1) forwards}
+.landing-title-accent:before{color:#7eb6ee;animation-delay:.7s}.landing-title-accent:after{color:#264fb5;animation-delay:1.08s}
+.landing-copy{color:#354660;animation:landing-rise .9s cubic-bezier(.16,1,.3,1) .48s backwards}
+.landing-top{animation:landing-slide .55s cubic-bezier(.16,1,.3,1) .02s backwards}
+.choice-heading{color:#53647c;animation:landing-wipe .7s cubic-bezier(.16,1,.3,1) .54s backwards}
+.choice-card{animation:landing-wipe .7s cubic-bezier(.16,1,.3,1) .62s backwards}
+.choice-card:nth-child(2){animation-delay:.74s}
+.landing-foot{color:#52627a;border-color:#9caec0;animation:landing-rise .9s cubic-bezier(.16,1,.3,1) .78s backwards}
+@keyframes landing-wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0)}}
+@keyframes landing-rise{from{opacity:0;transform:translate3d(0,25px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes landing-slide{from{opacity:0;transform:translate3d(-16px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes landing-paint{to{mask-size:calc(100% + 72px) 100%}}
+/* Chart movement is decorative; values, scales and status colours are unchanged. */
+.bar-fill{background-image:linear-gradient(90deg,transparent,rgba(255,255,255,.24));box-shadow:0 2px 7px #263a5b1c}
+.bar-track{height:10px}.stack-track{height:11px}.stack-track span{transform-origin:left;animation:chart-grow .8s cubic-bezier(.16,1,.3,1) both}
+.stack-track .seg-miss{animation-delay:.08s}.stack-track .seg-unknown{animation-delay:.16s}
+.trend-svg circle{transform-box:fill-box;transform-origin:center;animation:chart-point .55s cubic-bezier(.16,1,.3,1) .4s both}
+.donut{animation:chart-arrive .75s cubic-bezier(.16,1,.3,1) both;box-shadow:0 12px 24px #1f385b13}
+.analytics-grid>.card,.stats-grid>.stat-card{animation:chart-arrive .65s cubic-bezier(.16,1,.3,1) both}
+.analytics-grid>.card:nth-child(2),.stats-grid>.stat-card:nth-child(2){animation-delay:.06s}
+.analytics-grid>.card:nth-child(3),.stats-grid>.stat-card:nth-child(3){animation-delay:.12s}
+.analytics-grid>.card:nth-child(4),.stats-grid>.stat-card:nth-child(4){animation-delay:.18s}
+.stats-grid>.stat-card:nth-child(5){animation-delay:.24s}
+@keyframes chart-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes chart-point{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+@keyframes chart-arrive{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.landing-video{display:none}.landing h1 .landing-title-accent{color:#264fb5}.landing-title-accent:before,.landing-title-accent:after{content:none}.landing h1 .landing-title-first,.landing h1 .landing-title-accent,.landing-kicker,.landing-copy,.landing-top,.choice-heading,.choice-card,.landing-foot{animation:none;transform:none;clip-path:none;opacity:1}}
+@media print{.landing-motion{display:none}.analytics-grid>.card,.stats-grid>.stat-card,.trend-svg circle,.stack-track span,.donut{animation:none!important;opacity:1!important;transform:none!important}}
+
+/* Stratum-inspired landing sequence, applied only to the existing dashboard landing. */
+.landing-frame{position:absolute;inset:clamp(14px,2.35vw,30px);z-index:0;pointer-events:none;--frame-line:rgba(40,60,88,.28)}
+.landing-frame-line,.landing-frame-corner{position:absolute;background:var(--frame-line)}
+.landing-frame-line.top,.landing-frame-line.bottom{height:1px;left:26px;right:26px}
+.landing-frame-line.left,.landing-frame-line.right{width:1px;top:26px;bottom:26px}
+.landing-frame-line.top{top:0;transform-origin:left}.landing-frame-line.bottom{bottom:0;transform-origin:right}
+.landing-frame-line.left{left:0;transform-origin:top}.landing-frame-line.right{right:0;transform-origin:bottom}
+.landing-frame-corner{width:26px;height:26px;background:none}
+.landing-frame-corner.tl,.landing-frame-corner.br{background:linear-gradient(to bottom right,transparent calc(50% - .65px),var(--frame-line) calc(50% - .65px),var(--frame-line) calc(50% + .65px),transparent calc(50% + .65px))}
+.landing-frame-corner.tr,.landing-frame-corner.bl{background:linear-gradient(to bottom left,transparent calc(50% - .65px),var(--frame-line) calc(50% - .65px),var(--frame-line) calc(50% + .65px),transparent calc(50% + .65px))}
+.landing-frame-corner.tl{left:0;top:0}.landing-frame-corner.tr{right:0;top:0}.landing-frame-corner.bl{left:0;bottom:0}.landing-frame-corner.br{right:0;bottom:0}
+.landing-inner{z-index:1;padding-left:max(45px,3.6vw);padding-right:max(45px,3.6vw)}
+.landing-motion{will-change:transform;transform-origin:center;backface-visibility:hidden}
+/* Reset the prior paint/wipe sequence; the new animation runs once only. */
+.landing-kicker,.landing h1 .landing-title-first,.landing h1 .landing-title-accent,.landing-copy,.landing-top,.choice-heading,.choice-card,.landing-foot{animation:none}
+.landing h1 .landing-title-accent{color:#264fb5}.landing-title-accent:before,.landing-title-accent:after{content:none}
+.landing.anim .landing-frame-line.top{animation:frame-x .5s cubic-bezier(.65,0,.35,1) .04s both}
+.landing.anim .landing-frame-line.left{animation:frame-y .5s cubic-bezier(.65,0,.35,1) .04s both}
+.landing.anim .landing-frame-line.bottom{animation:frame-x .5s cubic-bezier(.65,0,.35,1) .2s both}
+.landing.anim .landing-frame-line.right{animation:frame-y .5s cubic-bezier(.65,0,.35,1) .2s both}
+.landing.anim .landing-frame-corner{animation:frame-fade .3s linear .55s both}
+.landing.anim .landing-top{animation:frame-settle .56s cubic-bezier(.22,.61,.36,1) .16s both}
+.landing.anim .landing-kicker{animation:frame-settle .56s cubic-bezier(.22,.61,.36,1) .3s both}
+.landing.anim .landing-title-first{animation:frame-mask .9s cubic-bezier(.16,1,.3,1) .42s both}
+.landing.anim .landing-title-accent{animation:frame-mask .9s cubic-bezier(.16,1,.3,1) .52s both}
+.landing.anim .landing-copy{animation:frame-settle .72s cubic-bezier(.22,.61,.36,1) .7s both}
+.landing.anim .choice-heading{animation:frame-fade .45s linear .6s both}
+.landing.anim .choice-card{animation:frame-settle .62s cubic-bezier(.22,.61,.36,1) .86s both}
+.landing.anim .choice-card:nth-child(2){animation-delay:.96s}
+.landing.anim .landing-foot{animation:frame-settle .52s cubic-bezier(.22,.61,.36,1) 1.08s both}
+.landing-decode{display:inline-block;white-space:pre}
+@keyframes frame-x{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes frame-y{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes frame-fade{from{opacity:0}to{opacity:1}}
+@keyframes frame-settle{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes frame-mask{from{opacity:0;transform:translateY(45%)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:680px){.landing-frame{inset:14px}.landing-inner{padding-left:30px;padding-right:30px}}
+@media(prefers-reduced-motion:reduce){.landing.anim .landing-frame-line,.landing.anim .landing-frame-corner,.landing.anim .landing-top,.landing.anim .landing-kicker,.landing.anim .landing-title-first,.landing.anim .landing-title-accent,.landing.anim .landing-copy,.landing.anim .choice-heading,.landing.anim .choice-card,.landing.anim .landing-foot{animation:none!important;opacity:1;transform:none}.landing-motion{transform:none!important}}
+@media print{.landing-frame{display:none}}

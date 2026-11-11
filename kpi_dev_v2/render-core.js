@@ -1,7 +1,8 @@
 function initializeLogos(){document.querySelectorAll('img[data-logo]').forEach(img=>{img.src=LOGOS[img.dataset.logo];});}
-function goHome(){state.currentCompany=null;document.body.removeAttribute('data-company');$('company-page').classList.remove('active');$('landing').classList.add('active');window.scrollTo(0,0);renderLandingStatus();}
+function syncLandingVideo(){const video=document.querySelector('.landing-video');if(!video)return;const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;if(state.currentCompany||reduced){video.pause();return;}const play=video.play();if(play&&play.catch)play.catch(()=>{});}
+function goHome(){state.currentCompany=null;document.body.removeAttribute('data-company');$('company-page').classList.remove('active');$('landing').classList.add('active');window.scrollTo(0,0);renderLandingStatus();syncLandingVideo();}
 function openCompany(company){
- state.currentCompany=company;state.selectedDepartment='all';state.selectedEmployee='all';state.selectedUnit='all';state.tableSearch='';state.tableStatus='all';state.activeTab='overview';
+ state.currentCompany=company;syncLandingVideo();state.selectedDepartment='all';state.selectedEmployee='all';state.selectedUnit='all';state.tableSearch='';state.tableStatus='all';state.activeTab='overview';
  document.body.dataset.company=company;$('landing').classList.remove('active');$('company-page').classList.add('active');
  $('company-logo').src=LOGOS[company];$('company-logo').alt=COMPANIES[company].name+' logo';$('company-logo').classList.toggle('xguard',company==='xguard');
  $('top-company').textContent=COMPANIES[company].name;$('heading-company').textContent=COMPANIES[company].name;$('company-subtitle').textContent=COMPANIES[company].subtitle;

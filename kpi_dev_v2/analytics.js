@@ -52,10 +52,10 @@ function workTheme(r){
 function displayEmpty(msg){return `<div class="empty-chart">${esc(msg)}</div>`;}
 function renderBars(items,opts={}){
  if(!items.length)return displayEmpty('No data for this selection.');
- const percentMode=opts.percent!==false,values=items.map(x=>x.value).filter(Number.isFinite),max=Math.max(percentMode?100:1,...values),color=opts.color||'var(--accent)';
+ const percentMode=opts.percent!==false,values=items.map(x=>x.value).filter(Number.isFinite),max=Math.max(percentMode?100:1,...values),palette=['#3569d4','#7954bd','#168b85','#cb7850','#b58a19','#5875a8'];
  return `<div class="bars">${items.map((item,i)=>{
   const ok=Number.isFinite(item.value),width=ok?Math.max(0,Math.min(100,item.value/max*100)):0,val=ok?(percentMode?pctText(item.value):numberText(item.value,0)):'—';
-  return `<div class="bar-row"><span class="bar-label" title="${esc(item.label)}">${esc(item.label)}</span><div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${esc(item.color||color)};animation-delay:${Math.min(i*.04,.3)}s"></div></div><span class="bar-value">${esc(val)}</span></div>`;
+  return `<div class="bar-row"><span class="bar-label" title="${esc(item.label)}">${esc(item.label)}</span><div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${esc(item.color||opts.color||palette[i%palette.length])};animation-delay:${Math.min(i*.04,.3)}s"></div></div><span class="bar-value">${esc(val)}</span></div>`;
  }).join('')}</div>`;
 }
 function renderStacks(items){
