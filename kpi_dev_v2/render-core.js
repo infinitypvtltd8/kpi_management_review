@@ -5,12 +5,12 @@ function openCompany(company){
  document.body.dataset.company=company;$('landing').classList.remove('active');$('company-page').classList.add('active');
  $('company-logo').src=LOGOS[company];$('company-logo').alt=COMPANIES[company].name+' logo';$('company-logo').classList.toggle('xguard',company==='xguard');
  $('top-company').textContent=COMPANIES[company].name;$('heading-company').textContent=COMPANIES[company].name;$('company-subtitle').textContent=COMPANIES[company].subtitle;
- $('switch-company').textContent=company==='apeiro'?'Switch to X GUARD ↗':'Switch to APEIRO ↗';$('department-tab').hidden=company==='apeiro';
+ $('switch-company').textContent=company==='apeiro'?'Switch to X GUARD ↗':'Switch to APEIRO ↗';$('department-tab').hidden=false;
  $('kpi-search').value='';$('status-select').value='all';renderAll();window.scrollTo(0,0);
 }
 function switchCompany(){openCompany(state.currentCompany==='apeiro'?'xguard':'apeiro');}
 function showTab(tab){
- if(tab==='departments'&&state.currentCompany==='apeiro')tab='overview';state.activeTab=tab;
+ state.activeTab=tab;
  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+tab));
  if(tab==='reports')renderReports();
@@ -22,7 +22,7 @@ function resetFilters(){state.selectedDepartment='all';state.selectedEmployee='a
 function changeUnit(unit){state.selectedUnit=unit;renderUnits();}
 function selectUnit(unit){state.selectedUnit=state.selectedUnit===unit?'all':unit;renderUnits();}
 function focusPerson(id){state.selectedEmployee=id;state.tableSearch='';state.tableStatus='all';$('kpi-search').value='';$('status-select').value='all';renderAll();showTab('people');}
-function focusDepartment(name){state.selectedDepartment=name;state.selectedEmployee='all';state.selectedUnit='all';renderAll();showTab('people');}
+function focusDepartment(name){state.selectedDepartment=state.selectedDepartment===name?'all':name;state.selectedEmployee='all';state.selectedUnit='all';renderAll();}
 function changeSearch(value){state.tableSearch=value;renderKpiTable();}
 function changeTableStatus(value){state.tableStatus=value;renderKpiTable();}
 function renderLandingStatus(){
@@ -34,9 +34,8 @@ function updateControls(){
  const company=state.currentCompany,periods=availablePeriods(company),periodSelect=$('period-select');
  if(!periods.length){periodSelect.disabled=true;periodSelect.innerHTML=`<option value="">${state.refreshing?'Loading available months…':'No months loaded'}</option>`;state.periodByCompany[company]=null;}
  else{periodSelect.disabled=false;if(!periods.includes(state.periodByCompany[company]))state.periodByCompany[company]=periods[0];periodSelect.innerHTML=periods.map(p=>`<option value="${esc(p)}">${esc(periodLabel(p))}</option>`).join('');periodSelect.value=state.periodByCompany[company];}
- const deptField=$('dept-filter-field'),deptSelect=$('dept-select');deptField.hidden=company==='apeiro';
- if(company==='apeiro')state.selectedDepartment='all';
- const depts=company==='xguard'?DEPARTMENTS:[];
+ const deptField=$('dept-filter-field'),deptSelect=$('dept-select');deptField.hidden=false;
+ const depts=departmentsFor(company);
  if(state.selectedDepartment!=='all'&&!depts.some(d=>d.name===state.selectedDepartment))state.selectedDepartment='all';
  deptSelect.innerHTML='<option value="all">All departments</option>'+depts.map(d=>`<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('');deptSelect.value=state.selectedDepartment;
  const people=eligiblePeople(company,false);if(state.selectedEmployee!=='all'&&!people.some(e=>e.id===state.selectedEmployee))state.selectedEmployee='all';

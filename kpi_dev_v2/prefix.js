@@ -26,6 +26,8 @@ const DEPARTMENTS=[
  {name:'Finance',head:'Nimmi',memberIds:['ravira']},
  {name:'Leadership & shared',head:'Nimmi',memberIds:['nimmi'],shared:true}
 ];
+const APEIRO_DEPARTMENTS=[{name:'Operations',head:'—',memberIds:['sumudu','heshani','steve']}];
+function departmentsFor(company){return company==='apeiro'?APEIRO_DEPARTMENTS:DEPARTMENTS;}
 // Review groups use the role structure supplied by the user. They are not
 // claims about a separate "unit" field in the source spreadsheet.
 const UNITS={
