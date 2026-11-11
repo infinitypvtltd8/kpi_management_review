@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPI - Management Review | BI Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        h1,h2,h3,.font-bold,.font-extrabold,.font-black,.display-font {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 800;
+            color: #000000;
+        }
+        .page { display: none; min-height: 100vh; width: 100%; }
+        .page.active { display: block; }
+
+        /* ---------- Landing ---------- */
+        .landing {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .brand-kicker {
+            font-size: 0.85rem; letter-spacing: 0.5em; text-transform: uppercase;
+            color: #1d4ed8; font-weight: 800; margin-bottom: 1rem;
+        }
+        .brand-title {
+            font-size: clamp(2.5rem, 9vw, 5rem); line-height: 1.02; margin: 0 0 1.25rem 0; letter-spacing: -0.03em;
+            color: #000000;
+        }
+        .brand-subtitle {
+            font-size: 1.15rem; color: #64748b;
+            max-width: 46rem; margin: 0 auto 3rem auto; line-height: 1.6; font-weight: 600;
+        }
+        .cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-company {
+            padding: 1rem 2rem; border-radius: 1rem; font-weight: 800;
+            font-size: 1rem; cursor: pointer; border: 2px solid; outline: none;
+            min-width: 160px; transition: all 0.2s;
+        }
+        .btn-apeiro { background: #2563eb; color: #fff; border-color: #1d4ed8; box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
+        .btn-xguard { background: #eab308; color: #000; border-color: #ca8a04; box-shadow: 0 4px 14px rgba(234,179,8,0.3); }
+        .btn-company:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .landing-hint { margin-top: 2rem; font-size: 0.75rem; color: #64748b; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700; }
+
+        /* ---------- Company shell ---------- */
+        .company-shell {
+            min-height: 100vh;
+            padding: 2.5rem 1.5rem 3rem; max-width: 1500px; margin: 0 auto; width: 100%;
+            background: #ffffff;
+        }
+        .nav-bar { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+        .back-btn {
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            color: #000; padding: 0.5rem 1rem; border-radius: 0.75rem;
+            font-size: 0.85rem; font-weight: 700; cursor: pointer;
+        }
+        .back-btn:hover { background: #f1f5f9; }
+        .page-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+        .page-title { font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -0.02em; }
+        .company-tag {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em;
+            padding: 0.2rem 0.75rem; border-radius: 999px; font-weight: 800; border: 1px solid;
+        }
+        .tag-apeiro { background: #dbeafe; color: #1d4ed8; border-color: #2563eb; }
+        .tag-xguard { background: #fef3c7; color: #ca8a04; border-color: #eab308; }
+        .page-subtitle { color: #64748b; font-size: 0.95rem; margin: 0 0 1.5rem 0; font-weight: 600; }
+        .divider { height: 1px; background: #e2e8f0; margin: 1.5rem 0 2rem 0; }
+
+        /* Data banner */
+        .data-banner {
+            display: flex; align-items: center; gap: 1rem;
+            background: #dbeafe; border: 1px solid #2563eb;
+            border-radius: 0.75rem; padding: 1rem 1.5rem; margin-bottom: 1.5rem;
+        }
+        .data-banner.xguard { background: #fef3c7; border-color: #eab308; }
+        .data-banner .dot { width: 12px; height: 12px; border-radius: 50%; background: #1d4ed8; flex-shrink: 0; }
+        .data-banner.xguard .dot { background: #ca8a04; }
+        .data-banner span { font-weight: 700; font-size: 0.9rem; color: #000; }
+
+        /* KPI scorecards */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .kpi-card {
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.25rem;
+            position: relative; overflow: hidden; transition: transform 0.2s;
+        }
+        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        .kpi-card::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #2563eb, #eab308); opacity: 0; transition: opacity 0.2s;
+        }
+        .kpi-card:hover::before { opacity: 1; }
+        .kpi-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: #64748b; margin-bottom: 0.5rem; font-weight: 700; }
+        .kpi-value { font-size: 2rem; font-weight: 800; color: #000; line-height: 1.1; }
+        .kpi-sub { font-size: 0.8rem; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.3rem; }
+        .trend-up { color: #15803d; } .trend-down { color: #dc2626; } .trend-neutral { color: #64748b; }
+
+        /* Sections */
+        .section { margin-bottom: 2.5rem; }
+        .section-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .section-title { font-size: 1.1rem; font-weight: 700; color: #000; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #2563eb; }
+        .dot-xguard { background: #eab308; }
+
+        /* CSS-based bar charts (no external library needed) */
+        .chart-grid { display: grid; gap: 1.25rem; margin-bottom: 1rem; }
+        .chart-grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+        .chart-card {
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.25rem;
+            display: flex; flex-direction: column;
+        }
+        .chart-card h4 { margin: 0 0 1rem 0; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; }
+        .css-chart { width: 100%; height: 220px; display: flex; align-items: flex-end; gap: 12px; padding-bottom: 30px; position: relative; }
+        .css-bar { flex: 1; background: #cbd5e1; border-radius: 4px 4px 0 0; position: relative; transition: height 0.5s ease; }
+        .css-bar.apeiro { background: #2563eb; }
+        .css-bar.xguard { background: #eab308; }
+        .css-bar-label { position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: #64748b; font-weight: 700; white-space: nowrap; }
+        .css-bar-value { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; font-weight: 800; color: #000; }
+        .css-doughnut { width: 160px; height: 160px; border-radius: 50%; background: conic-gradient(#2563eb 0deg 120deg, #e2e8f0 120deg 360deg); margin: 0 auto; position: relative; }
+        .css-doughnut::after { content: ''; position: absolute; top: 22px; left: 22px; right: 22px; bottom: 22px; border-radius: 50%; background: #fff; z-index: 1; }
+        .css-doughnut-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; text-align: center; }
+        .css-doughnut-num { font-size: 1.5rem; font-weight: 800; color: #000; display: block; }
+        .css-doughnut-lbl { font-size: 0.7rem; color: #64748b; font-weight: 700; }
+        .css-line { width: 100%; height: 180px; position: relative; border-bottom: 1px solid #e2e8f0; border-left: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .css-line-point { position: absolute; width: 10px; height: 10px; background: #2563eb; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .css-line-label { position: absolute; bottom: -25px; font-size: 0.7rem; color: #64748b; font-weight: 700; }
+
+        /* Tables */
+        .table-wrap { overflow-x: auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; margin-bottom: 1rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { text-align: left; padding: 0.8rem 1rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.7rem; border-bottom: 2px solid #e2e8f0; background: #f8fafc; }
+        td { padding: 0.8rem 1rem; border-bottom: 1px solid rgba(0,0,0,0.05); color: #000; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8fafc; }
+        .ach-badge { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 800; }
+        .ach-good { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+        .ach-warn { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+        .ach-bad { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+        .emp-col { font-weight: 800; color: #000; }
+
+        /* Employee cards */
+        .emp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .emp-card {
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.25rem;
+            transition: all 0.2s; position: relative; overflow: hidden;
+        }
+        .emp-card::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: #2563eb; opacity: 0; transition: opacity 0.2s;
+        }
+        .emp-card.xguard::before { background: #eab308; }
+        .emp-card:hover { transform: translateY(-4px); border-color: #cbd5e1; box-shadow: 0 12px 28px -6px rgba(0,0,0,0.1); }
+        .emp-card:hover::before { opacity: 1; }
+        .emp-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .emp-avatar { width: 40px; height: 40px; border-radius: 50%; background: #2563eb; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+        .emp-card.xguard .emp-avatar { background: #eab308; color: #000; box-shadow: 0 4px 12px rgba(234,179,8,0.35); }
+        .emp-info h3 { margin: 0; font-size: 1rem; font-weight: 800; color: #000; }
+        .emp-info p { margin: 0.1rem 0 0; font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+        .emp-stats { display: flex; gap: 0.6rem; margin-top: 1rem; }
+        .emp-stat { flex: 1; background: #f8fafc; border-radius: 0.75rem; padding: 0.6rem; text-align: center; border: 1px solid #e2e8f0; }
+        .emp-stat .num { display: block; font-size: 1.1rem; font-weight: 800; color: #000; }
+        .emp-stat .lbl { font-size: 0.6rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.1rem; font-weight: 700; }
+
+        /* Department cards */
+        .dept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .dept-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1rem; }
+        .dept-card.xguard { border-left: 4px solid #eab308; }
+        .dept-card h4 { margin: 0 0 0.4rem 0; font-size: 0.95rem; color: #000; font-weight: 800; }
+        .dept-card .dept-head { font-size: 0.7rem; color: #1d4ed8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; display: block; }
+        .dept-card.xguard .dept-head { color: #ca8a04; }
+        .dept-card .metric { font-size: 0.75rem; color: #64748b; margin: 0.15rem 0; font-weight: 600; }
+        .dept-card .highlight { font-size: 1.25rem; font-weight: 800; margin-top: 0.4rem; color: #000; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; margin: 1.5rem 0 1rem 0; border-bottom: 2px solid #e2e8f0; overflow-x: auto; }
+        .tab { padding: 0.7rem 1.4rem; color: #64748b; font-weight: 700; font-size: 0.85rem; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.2s; }
+        .tab.active { color: #1d4ed8; border-bottom-color: #2563eb; }
+        .tab.xguard.active { color: #ca8a04; border-bottom-color: #eab308; }
+        .tab:hover { color: #000; background: #f8fafc; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 3rem 1rem; color: #64748b; border: 1px dashed #e2e8f0; border-radius: 1rem; background: #f8fafc; }
+        .empty-state h3 { color: #000; margin-bottom: 0.5rem; font-weight: 800; }
+
+        /* Forecast */
+        .forecast-panel { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+        .forecast-item { text-align: center; }
+        .forecast-item .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #64748b; margin-bottom: 0.3rem; font-weight: 700; }
+        .forecast-item .value { font-size: 1.4rem; font-weight: 800; color: #000; }
+        .forecast-item .delta { font-size: 0.7rem; margin-top: 0.2rem; font-weight: 600; }
+
+        /* Subsidiary */
+        .sub-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .sub-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1rem; text-align: center; }
+        .sub-card h4 { margin: 0 0 0.4rem 0; font-size: 1rem; color: #000; font-weight: 800; }
+        .sub-card .metric { font-size: 0.8rem; color: #64748b; margin: 0.15rem 0; font-weight: 600; }
+        .sub-card .highlight { font-size: 1.25rem; font-weight: 800; margin-top: 0.4rem; color: #000; }
+
+        @media (max-width: 640px) {
+            .company-shell { padding: 1.5rem 1rem 2rem; }
+            .cta-group { flex-direction: column; align-items: center; }
+            .btn-company { width: 100%; max-width: 240px; }
+            .kpi-grid { grid-template-columns: 1fr; }
+            .chart-grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= LANDING PAGE ================= -->
+    <div class="page active" id="landing">
+        <div class="landing">
+            <div class="brand-kicker">Business Intelligence</div>
+            <div class="brand-title">KPI - Management Review</div>
+            <div class="brand-subtitle">
+                Subsidiary performance analytics across APEIRO and X GUARD.<br>
+                Individual, departmental, and group-level KPIs with month-over-month trends and forecasts.
+            </div>
+            <div class="cta-group">
+                <button class="btn-company btn-apeiro" onclick="openCompany('apeiro')">APEIRO</button>
+                <button class="btn-company btn-xguard" onclick="openCompany('xguard')">X GUARD</button>
+            </div>
+            <div class="landing-hint">BI Dashboard &bull; Forecasting &bull; KPIs</div>
+        </div>
+    </div>
+
+    <!-- ================= COMPANY PAGE ================= -->
+    <div class="page" id="company-page">
+        <div class="company-shell">
+            <nav class="nav-bar">
+                <button class="back-btn" onclick="goHome()">&#8592; Back to Review</button>
+            </nav>
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title" id="company-name">APEIRO</h1>
+                    <span class="company-tag tag-apeiro" id="company-tag">Operations</span>
+                </div>
+            </div>
+            <p class="page-subtitle" id="company-subtitle">KPI Management Review &bull; This Month vs Previous Month</p>
+            <div class="divider"></div>
+
+            <div class="data-banner" id="data-banner">
+                <span class="dot"></span>
+                <span id="data-banner-text">Employee KPI data loaded</span>
+            </div>
+
+            <div class="section">
+                <div class="kpi-grid" id="exec-scorecards"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-header"><h2 class="section-title"><span class="dot"></span> Performance Overview</h2></div>
+                <div class="chart-grid chart-grid-2">
+                    <div class="chart-card"><h4>Achievement % by Employee</h4><div class="css-chart" id="css-emp-bar"></div></div>
+                    <div class="chart-card"><h4>KPI Status Distribution</h4><div class="css-doughnut" id="css-doughnut"><div class="css-doughnut-text"><span class="css-doughnut-num" id="doughnut-num">—</span><span class="css-doughnut-lbl" id="doughnut-lbl">—</span></div></div></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header"><h2 class="section-title"><span class="dot"></span> Trend &amp; Forecast</h2></div>
+                <div class="chart-grid chart-grid-2">
+                    <div class="chart-card"><h4>Month-over-Month Trend</h4><div class="css-line" id="css-trend"></div></div>
+                    <div class="chart-card"><h4>Target vs Actual Variance</h4><div class="css-chart" id="css-variance"></div></div>
+                </div>
+                <div class="forecast-panel" id="forecast-panel"></div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab(this,'individual')">Individual KPIs</button>
+                <button class="tab" onclick="switchTab(this,'department')">Departmental Breakdown</button>
+                <button class="tab" onclick="switchTab(this,'subsidiary')">Subsidiary View</button>
+            </div>
+
+            <div class="tab-panel active" id="tab-individual">
+                <div class="emp-grid" id="emp-leaderboard"></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Employee</th><th>Department</th><th>KPI Area</th><th>Target</th><th>Actual</th><th>Ach. %</th><th>Vs Prev</th><th>Status</th><th>Remarks</th></tr>
+                        </thead>
+                        <tbody id="kpi-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-department">
+                <div class="chart-grid chart-grid-2">
+                    <div class="chart-card"><h4>Department Achievement</h4><div class="css-chart" id="css-dept"></div></div>
+                    <div class="chart-card"><h4>KPIs Met vs Total</h4><div class="css-chart" id="css-dept-met"></div></div>
+                </div>
+                <div class="dept-grid" id="dept-cards"></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Department</th><th>Headcount</th><th>Dept Head</th><th>Avg Achievement</th><th>KPIs Met</th><th>Total KPIs</th><th>Met Rate</th></tr></thead>
+                        <tbody id="dept-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-panel" id="tab-subsidiary">
+                <div class="section-header"><h2 class="section-title"><span class="dot dot-xguard"></span> Subsidiary Comparison: X GUARD &rarr; APEIRO</h2></div>
+                <div class="sub-matrix" id="subsidiary-matrix"></div>
+                <div class="chart-card" style="margin-top:1rem;"><h4>Subsidiary Achievement Comparison</h4><div class="css-chart" id="css-subsidiary"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const COMPANIES = {
+            apeiro: {
+                name: "APEIRO", tag: "Operations Department", color: "#2563eb", tagClass: "tag-apeiro",
+                subtitle: "All 3 members are in Operations &bull; Departmental breakdown not required",
+                hasData: true,
+                employees: [
+                    {
+                        id: "sumudu", name: "Sumudu", avatar: "SU", role: "Operations", dept: "Operations",
+                        currentMonth: [
+                            { kpi: "Conduct refresher training sessions - 4 sessions total", target: 4, actual: 4, achievement: 100, remarks: "NA", met: true, prevAch: 125 },
+                            { kpi: "Achieve Monthly production targets - 9975", target: 9875, actual: 12570, achievement: 126, remarks: "", met: true, prevAch: 146 },
+                            { kpi: "Maintain staffing levels minimum of 50", target: 58, actual: 26, achievement: 45, remarks: "NA", met: false, prevAch: 103 },
+                            { kpi: "Increase cross-project resource utilization - 3", target: 3, actual: 3, achievement: 100, remarks: "Book car 3 users moved to biorxiv", met: true, prevAch: 100 },
+                        ],
+                        previousMonth: [
+                            { kpi: "Conduct refresher training sessions for each project every month", target: 4, actual: 5, achievement: 125, remarks: "", met: true },
+                            { kpi: "Achieve monthly volume targets", target: 8400, actual: 12264, achievement: 146, remarks: "", met: true },
+                            { kpi: "Project accuracy (monthly)", target: 96, actual: 99.13, achievement: 103, remarks: "", met: true },
+                            { kpi: "Increase cross-project resource utilization", target: 3, actual: 3, achievement: 100, remarks: "", met: true },
+                            { kpi: "Submit monthly reports on time", target: 90, actual: 90, achievement: 100, remarks: "", met: true },
+                        ]
+                    },
+                    {
+                        id: "heshani", name: "Heshani", avatar: "HE", role: "Operations", dept: "Operations",
+                        currentMonth: [
+                            { kpi: "Cargoserv – Secure appointments", target: 100, actual: 100, achievement: 100, remarks: "", met: true, prevAch: 100 },
+                            { kpi: "Cargoserv – Follow up scheduled appointments 24h before", target: 100, actual: 100, achievement: 100, remarks: "-", met: true, prevAch: 100 },
+                            { kpi: "Cargoserv – Follow up appointment conducted within 24h", target: 100, actual: 100, achievement: 100, remarks: "-", met: true, prevAch: 100 },
+                            { kpi: "Mr Mathu- BNI Time Tracker – Submit/update tracker", target: 100, actual: 100, achievement: 100, remarks: "", met: true, prevAch: 100 },
+                            { kpi: "Mr Mathu-Pick a Book – Update parents before sessions", target: 100, actual: 100, achievement: 100, remarks: "", met: true, prevAch: 100 },
+                            { kpi: "Mr Mathu – Register collaborations- Training Programme", target: 100, actual: 100, achievement: 100, remarks: "", met: true, prevAch: 100 },
+                            { kpi: "Informatics- Scheduling interview appointments", target: 100, actual: 100, achievement: 100, remarks: "", met: true, prevAch: 100 },
+                            { kpi: "Informatics-Following up with candidates through interview", target: 100, actual: 100, achievement: 100, remarks: "", met: true, prevAch: 100 },
+                            { kpi: "Informatics- Post-interview follow-ups & feedback", target: 100, actual: 100, achievement: 100, remarks: "", met: true, prevAch: 100 },
+                        ],
+                        previousMonth: []
+                    },
+                    {
+                        id: "steve", name: "Steve", avatar: "ST", role: "Operations", dept: "Operations",
+                        currentMonth: [
+                            { kpi: "Resolve daily queries/doubts of ELSEVIER project team", target: 1, actual: 3, achievement: 300, remarks: "NA", met: true, prevAch: 100 },
+                            { kpi: "Major process improvement to be implemented", target: 1, actual: 3, achievement: 300, remarks: "-", met: true, prevAch: 100 },
+                            { kpi: "Identify prospective business contacts / revenue tool", target: 1, actual: 2, achievement: 200, remarks: "NA", met: true, prevAch: 100 },
+                            { kpi: "Actively communicate & build rapport with prospective contact", target: 1, actual: 1, achievement: 100, remarks: "-", met: true, prevAch: 100 },
+                        ],
+                        previousMonth: []
+                    }
+                ],
+                departments: [{ name: "Operations", head: "Operations Team", members: ["Sumudu", "Heshani", "Steve"] }]
+            },
+            xguard: {
+                name: "X GUARD", tag: "KPI Management Review", color: "#eab308", tagClass: "tag-xguard",
+                subtitle: "Departmental breakdown active &bull; EO's, Admin, HR & Recruitment, Finance",
+                hasData: false,
+                employees: [
+                    { id: "dewa", name: "Dewa", avatar: "DW", role: "EO", dept: "EO's" },
+                    { id: "malintha", name: "Malintha", avatar: "ML", role: "EO", dept: "EO's" },
+                    { id: "sampath", name: "Sampath", avatar: "SP", role: "EO", dept: "EO's" },
+                    { id: "geeth", name: "Geeth", avatar: "GE", role: "Admin", dept: "Admin" },
+                    { id: "uthpala", name: "Uthpala", avatar: "UT", role: "Admin / HR & Recruitment", dept: "Admin" },
+                    { id: "ramal", name: "Ramal", avatar: "RA", role: "HR & Recruitment", dept: "HR & Recruitment" },
+                    { id: "ravira", name: "Ravira", avatar: "RV", role: "Finance", dept: "Finance" },
+                    { id: "nimmi", name: "Nimmi", avatar: "NM", role: "Department Head", dept: "Admin / HR & Recruitment / Finance" }
+                ],
+                departments: [
+                    { name: "EO's", head: "—", members: ["Dewa", "Malintha", "Sampath"] },
+                    { name: "Admin", head: "Nimmi", members: ["Geeth", "Uthpala"] },
+                    { name: "HR & Recruitment", head: "Nimmi", members: ["Uthpala", "Ramal"] },
+                    { name: "Finance", head: "Nimmi", members: ["Ravira"] }
+                ]
+            }
+        };
+
+        let currentCompany = null;
+
+        function goHome() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('landing').classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function openCompany(key) {
+            currentCompany = key;
+            const c = COMPANIES[key];
+            document.getElementById('company-name').textContent = c.name;
+            document.getElementById('company-tag').textContent = c.tag;
+            document.getElementById('company-tag').className = 'company-tag ' + c.tagClass;
+            document.getElementById('company-subtitle').textContent = c.subtitle;
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const page = document.getElementById('company-page');
+            page.classList.add('active');
+            page.classList.toggle('xguard', key === 'xguard');
+            window.scrollTo(0,0);
+            renderCompany(key);
+        }
+
+        function switchTab(btn, tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function avgAch(kpis) { if (!kpis || !kpis.length) return 0; return Math.round(kpis.reduce((s,k)=>s+k.achievement,0)/kpis.length); }
+        function metCount(kpis) { if (!kpis) return 0; return kpis.filter(k=>k.met).length; }
+        function fmt(n) { if (n==null) return '-'; return n>=1000 ? n.toLocaleString() : n.toString(); }
+        function badgeClass(ach) { if (ach>=100) return 'ach-good'; if (ach>=70) return 'ach-warn'; return 'ach-bad'; }
+
+        function renderCompany(key) {
+            const c = COMPANIES[key];
+            const banner = document.getElementById('data-banner');
+            const bannerText = document.getElementById('data-banner-text');
+            if (c.hasData) {
+                banner.className = 'data-banner';
+                bannerText.textContent = 'Employee KPI data loaded from spreadsheet — ' + c.employees.length + ' team members';
+            } else {
+                banner.className = 'data-banner xguard';
+                bannerText.textContent = 'Employee structure configured — KPI values pending (no data in spreadsheet)';
+            }
+            renderExecScorecards(c);
+            renderEmpLeaderboard(c);
+            renderKPITable(c);
+            renderDeptTable(c);
+            renderDeptCards(c);
+            renderSubsidiaryMatrix(c);
+            renderCharts(c);
+            renderForecast(c);
+        }
+
+        function renderExecScorecards(c) {
+            const container = document.getElementById('exec-scorecards');
+            const emps = c.employees;
+            let totalKPIs=0, totalMet=0, sumAch=0, prevSum=0, prevCount=0;
+            emps.forEach(e=>{
+                if(e.currentMonth){ e.currentMonth.forEach(k=>{ totalKPIs++; totalMet+=k.met?1:0; sumAch+=k.achievement; if(k.prevAch!=null){prevSum+=k.prevAch; prevCount++;} }); }
+                if(e.previousMonth){ e.previousMonth.forEach(k=>{ prevSum+=k.achievement; prevCount++; }); }
+            });
+            const avg = totalKPIs ? Math.round(sumAch/totalKPIs) : 0;
+            const metRate = totalKPIs ? Math.round((totalMet/totalKPIs)*100) : 0;
+            const prevAvg = prevCount ? Math.round(prevSum/prevCount) : 0;
+            const delta = prevAvg ? avg - prevAvg : 0;
+            const deltaStr = delta>=0 ? '+'+delta+'% vs last month' : delta+'% vs last month';
+            const deltaClass = delta>=0 ? 'trend-up' : (delta<0 ? 'trend-down' : 'trend-neutral');
+            const forecast = Math.round(avg * (prevAvg ? (avg/Math.max(prevAvg,1)) : 1));
+
+            container.innerHTML = `
+                <div class="kpi-card"><div class="kpi-label">Total Team Members</div><div class="kpi-value">${emps.length}</div></div>
+                <div class="kpi-card"><div class="kpi-label">Total KPIs (This Month)</div><div class="kpi-value">${totalKPIs}</div></div>
+                <div class="kpi-card"><div class="kpi-label">Avg Achievement %</div><div class="kpi-value">${avg}%</div><div class="kpi-sub ${deltaClass}">${delta>=0?'&#9650;':'&#9660;'} ${deltaStr}</div></div>
+                <div class="kpi-card"><div class="kpi-label">KPIs Met Rate</div><div class="kpi-value">${metRate}%</div><div class="kpi-sub trend-neutral">${totalMet} / ${totalKPIs} met</div></div>
+                <div class="kpi-card"><div class="kpi-label">Forecast Next Month</div><div class="kpi-value">${forecast}%</div><div class="kpi-sub trend-neutral">Trend-based projection</div></div>
+            `;
+        }
+
+        function renderEmpLeaderboard(c) {
+            const container = document.getElementById('emp-leaderboard');
+            if (!c.employees || c.employees.length===0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><h3>No employee records</h3><p>No employees configured for this company.</p></div>';
+                return;
+            }
+            container.innerHTML = c.employees.map(e=>{
+                const kpis = e.currentMonth || [];
+                const met = metCount(kpis);
+                const total = kpis.length;
+                const av = avgAch(kpis);
+                const hasData = kpis.length > 0;
+                return `
+                    <div class="emp-card ${!hasData?'opacity-60':''}">
+                        <div class="emp-header">
+                            <div class="emp-avatar">${e.avatar}</div>
+                            <div class="emp-info"><h3>${e.name}</h3><p>${e.role} &bull; ${e.dept}</p></div>
+                        </div>
+                        <div class="emp-stats">
+                            <div class="emp-stat"><span class="num">${hasData?av:'—'}%</span><span class="lbl">Avg Achievement</span></div>
+                            <div class="emp-stat"><span class="num">${hasData?met:'—'}/${hasData?total:'—'}</span><span class="lbl">KPIs Met</span></div>
+                            <div class="emp-stat"><span class="num">${hasData?total:'—'}</span><span class="lbl">Total KPIs</span></div>
+                        </div>
+                        ${!hasData?'<div style="margin-top:0.75rem;font-size:0.7rem;color:#64748b;text-align:center;">KPI data pending</div>':''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderKPITable(c) {
+            const tbody = document.getElementById('kpi-table-body');
+            if (!c.employees || c.employees.length===0) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:#64748b;">No KPI data available.</td></tr>'; return; }
+            let hasAnyData=false;
+            const rows = c.employees.flatMap(e=>{
+                const kpis = e.currentMonth || [];
+                if(kpis.length) hasAnyData=true;
+                return kpis.map(k=>{
+                    const vsPrev = k.prevAch!=null ? (k.achievement>=k.prevAch?'+':'')+(k.achievement-k.prevAch)+'%' : '—';
+                    return `<tr${!kpis.length?' class="pending-row"':''}>
+                        <td class="emp-col">${e.name}<br><span style="font-size:0.75rem;color:#64748b;">${e.dept}</span></td>
+                        <td>${e.dept}</td><td>${k.kpi||'KPI record pending'}</td>
+                        <td>${fmt(k.target)}</td><td>${fmt(k.actual)}</td>
+                        <td><span class="ach-badge ${badgeClass(k.achievement)}">${k.achievement}%</span></td>
+                        <td style="font-size:0.8rem;color:#64748b;">${vsPrev}</td>
+                        <td><span class="ach-badge ${k.met?'ach-good':'ach-bad'}">${k.met?'Met':'Not Met'}</span></td>
+                        <td style="font-size:0.8rem;color:#64748b;">${k.remarks||'-'}</td>
+                    </tr>`;
+                });
+            });
+            if(!hasAnyData) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:3rem;color:#64748b;">No KPI values loaded for ${c.name}. Share the X GUARD KPI data to populate this table.</td></tr>`;
+            } else {
+                tbody.innerHTML = rows.join('');
+            }
+        }
+
+        function renderDeptTable(c) {
+            const tbody = document.getElementById('dept-table-body');
+            if (c.name === 'APEIRO') {
+                const emp=c.employees;
+                const totalKPIs=emp.reduce((s,e)=>s+(e.currentMonth||[]).length,0);
+                const totalMet=emp.reduce((s,e)=>s+metCount(e.currentMonth||[]),0);
+                const avg = emp.length ? Math.round(emp.reduce((s,e)=>s+avgAch(e.currentMonth||[]),0)/emp.length) : 0;
+                tbody.innerHTML = `<tr><td>Operations</td><td>${emp.length}</td><td>Operations Team</td><td>${avg}%</td><td>${totalMet}</td><td>${totalKPIs}</td><td>${totalKPIs?Math.round((totalMet/totalKPIs)*100):0}%</td></tr>`;
+                return;
+            }
+            let html='';
+            c.departments.forEach(d=>{
+                const deptEmps = c.employees.filter(e=>e.dept===d.name || (d.name==='Admin'&&e.dept.includes('Admin')) || (d.name==='HR & Recruitment'&&e.dept.includes('HR')));
+                let deptKPIs=0, deptMet=0, deptSum=0;
+                deptEmps.forEach(e=>{ const k=e.currentMonth||[]; deptKPIs+=k.length; deptMet+=metCount(k); deptSum+=k.reduce((s,x)=>s+x.achievement,0); });
+                const deptAvg = deptKPIs ? Math.round(deptSum/deptKPIs) : 0;
+                html += `<tr><td>${d.name}</td><td>${deptEmps.length}</td><td>${d.head}</td><td>${deptKPIs?deptAvg:'—'}%</td><td>${deptMet}</td><td>${deptKPIs}</td><td>${deptKPIs?Math.round((deptMet/deptKPIs)*100):'—'}%</td></tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center;padding:2rem;color:#64748b;">No departmental data.</td></tr>';
+        }
+
+        function renderDeptCards(c) {
+            const container = document.getElementById('dept-cards');
+            if (c.name === 'APEIRO') {
+                container.innerHTML = '<div class="empty-state"><h3>Departmental breakdown not required</h3><p>All APEIRO members (Sumudu, Steve, Sumudu) are in the Operations department.</p></div>';
+                return;
+            }
+            container.innerHTML = c.departments.map(d=>{
+                const deptEmps = c.employees.filter(e=>e.dept===d.name);
+                let deptKPIs=0, deptMet=0, deptSum=0;
+                deptEmps.forEach(e=>{ const k=e.currentMonth||[]; deptKPIs+=k.length; deptMet+=metCount(k); deptSum+=k.reduce((s,x)=>s+x.achievement,0); });
+                const deptAvg = deptKPIs ? Math.round(deptSum/deptKPIs) : 0;
+                return `<div class="dept-card xguard"><span class="dept-head">${d.name} Department</span><h4>${d.head}</h4><div class="metric">Members: ${deptEmps.length}</div><div class="metric">KPIs: ${deptMet} / ${deptKPIs} met</div><div class="highlight">${deptKPIs?deptAvg:'—'}%</div></div>`;
+            }).join('');
+        }
+
+        function renderSubsidiaryMatrix(c) {
+            const container = document.getElementById('subsidiary-matrix');
+            const ape=COMPANIES.apeiro; const xg=COMPANIES.xguard;
+            const apeAvg = ape.employees ? Math.round(ape.employees.reduce((s,e)=>s+avgAch(e.currentMonth||[]),0)/ape.employees.length) : 0;
+            const apeMet = ape.employees.reduce((s,e)=>s+metCount(e.currentMonth||[]),0);
+            const apeTotal = ape.employees.reduce((s,e)=>s+(e.currentMonth||[]).length,0);
+            container.innerHTML = `
+                <div class="sub-card"><h4 style="color:#1d4ed8;">APEIRO</h4><p class="metric">Operations Department</p><div class="highlight">${apeAvg}%</div><p class="metric">${apeMet} / ${apeTotal} KPIs Met</p><p class="metric" style="color:#1d4ed8;font-weight:700;">3 Members</p></div>
+                <div class="sub-card"><h4 style="color:#ca8a04;">X GUARD</h4><p class="metric">4 Departments</p><div class="highlight" style="color:#64748b;">—</div><p class="metric">KPIs pending</p><p class="metric" style="color:#ca8a04;font-weight:700;">${xg.employees.length} Members</p></div>
+            `;
+        }
+
+        /* ---------- CSS Bar Chart Helpers ---------- */
+        function createCssChart(containerId, labels, values, colorClass, maxVal=150) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            const max = Math.max(...values, maxVal);
+            el.innerHTML = values.map((v, i) => {
+                const h = Math.round((v / max) * 100);
+                return `<div class="css-bar ${colorClass}" style="height:${h}%;">
+                    <div class="css-bar-value">${v}</div>
+                    <div class="css-bar-label">${labels[i]}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderCharts(c) {
+            if (!c.employees || c.employees.length === 0) return;
+            const emps = c.employees;
+            const avgs = emps.map(e => avgAch(e.currentMonth || []));
+            const met = emps.map(e => metCount(e.currentMonth || []));
+            const total = emps.map(e => (e.currentMonth || []).length);
+
+            // Achievement bar
+            createCssChart('css-emp-bar', emps.map(e=>e.name), avgs, 'apeiro', 150);
+
+            // Doughnut
+            const totalMet = met.reduce((a,b)=>a+b,0);
+            const totalNotMet = total.reduce((a,b,i)=>a+(b-met[i]),0);
+            const pct = totalMet + totalNotMet > 0 ? Math.round((totalMet/(totalMet+totalNotMet))*100) : 0;
+            const deg = Math.round((pct/100)*360);
+            const d = document.getElementById('css-doughnut');
+            if (d) {
+                d.style.background = `conic-gradient(#2563eb 0deg ${deg}deg, #e2e8f0 ${deg}deg 360deg)`;
+                document.getElementById('doughnut-num').textContent = pct + '%';
+                document.getElementById('doughnut-lbl').textContent = 'KPIs Met';
+            }
+
+            // Trend line
+            const prevAvg = c.employees ? Math.round(c.employees.reduce((s,e)=>{ const pm=e.previousMonth||[]; return pm.length ? s + pm.reduce((a,k)=>a+k.achievement,0)/pm.length : s; },0)/c.employees.length) : 0;
+            const curAvg = c.employees ? Math.round(avgs.reduce((a,b)=>a+b,0)/Math.max(avgs.length,1)) : 0;
+            const trendEl = document.getElementById('css-trend');
+            if (trendEl) {
+                const h1 = Math.round((prevAvg/150)*100);
+                const h2 = Math.round((curAvg/150)*100);
+                trendEl.innerHTML = `
+                    <div class="css-line-point" style="left:10%; top:${100-h1}%;"></div>
+                    <div class="css-line-point" style="left:90%; top:${100-h2}%;"></div>
+                    <div class="css-line-label" style="left:10%;">Prev Month</div>
+                    <div class="css-line-label" style="right:10%; transform:translateX(100%);">This Month</div>
+                `;
+            }
+
+            // Variance (target vs actual)
+            const targets = emps.flatMap(e => (e.currentMonth || []).map(k => k.target));
+            const actuals = emps.flatMap(e => (e.currentMonth || []).map(k => k.actual));
+            const varianceLabels = [];
+            const varianceVals = [];
+            const varianceColors = [];
+            targets.forEach((t, i) => {
+                varianceLabels.push('KPI '+(i+1));
+                varianceVals.push(actuals[i]);
+                varianceColors.push('apeiro');
+            });
+            createCssChart('css-variance', varianceLabels, varianceVals, 'apeiro', Math.max(...targets, ...actuals));
+
+            // Dept chart
+            if (c.name !== 'APEIRO' && emps.length) {
+                const depts = {};
+                emps.forEach(e=>{ const d=e.dept; if(!depts[d]) depts[d]={sum:0,count:0}; const k=e.currentMonth||[]; depts[d].sum+=k.reduce((a,x)=>a+x.achievement,0); depts[d].count+=k.length; });
+                const dLabels = Object.keys(depts);
+                const dVals = dLabels.map(l=> depts[l].count ? Math.round(depts[l].sum/depts[l].count) : 0);
+                createCssChart('css-dept', dLabels, dVals, 'xguard', 150);
+
+                // Dept met vs total
+                const dMet = dLabels.map(l=> {
+                    const deptEmps = emps.filter(e=>e.dept===l);
+                    let m=0,t=0;
+                    deptEmps.forEach(e=>{ const k=e.currentMonth||[]; m+=metCount(k); t+=k.length; });
+                    return t>0 ? Math.round((m/t)*100) : 0;
+                });
+                createCssChart('css-dept-met', dLabels, dMet, 'xguard', 100);
+            }
+
+            // Subsidiary chart
+            const ape = COMPANIES.apeiro;
+            const xg = COMPANIES.xguard;
+            const apeAvg = ape.employees ? Math.round(ape.employees.reduce((s,e)=>s+avgAch(e.currentMonth||[]),0)/ape.employees.length) : 0;
+            const xgEmpsWithData = xg.employees.filter(e=>(e.currentMonth||[]).length>0);
+            const xgAvg = xgEmpsWithData.length ? Math.round(xgEmpsWithData.reduce((s,e)=>s+avgAch(e.currentMonth||[]),0)/xgEmpsWithData.length) : 0;
+            createCssChart('css-subsidiary', ['APEIRO', 'X GUARD'], [apeAvg, xgAvg||0], 'apeiro', 150);
+        }
+
+        function renderForecast(c){
+            const panel=document.getElementById('forecast-panel');
+            const emps=c.employees||[];
+            let curSum=0, curCnt=0, prevSum=0, prevCnt=0;
+            emps.forEach(e=>{ (e.currentMonth||[]).forEach(k=>{curSum+=k.achievement; curCnt++;}); (e.previousMonth||[]).forEach(k=>{prevSum+=k.achievement; prevCnt++;}); });
+            const curAvg = curCnt ? Math.round(curSum/curCnt) : 0;
+            const prevAvg = emps.reduce((s,e)=>{ const pm=e.previousMonth||[]; return pm.length ? s + pm.reduce((a,k)=>a+k.achievement,0)/pm.length : s; },0)/Math.max(emps.length,1);
+            const trend = prevAvg ? ((curAvg-prevAvg)/prevAvg)*100 : 0;
+            const forecast = Math.round(curAvg*(1+trend/100));
+            const trendDir = trend>=0 ? 'trend-up' : 'trend-down';
+            const trendIcon = trend>=0 ? '&#9650;' : '&#9660;';
+            const hasData = curCnt>0;
+            panel.innerHTML = `
+                <div class="forecast-item"><div class="label">Current Avg Achievement</div><div class="value">${hasData?curAvg:'—'}%</div><div class="delta ${trendDir}">${hasData?trendIcon+' '+trend.toFixed(1)+'% vs prev month':'No data'}</div></div>
+                <div class="forecast-item"><div class="label">Forecast Next Month</div><div class="value">${hasData?forecast:'—'}%</div><div class="delta trend-neutral">Linear trend projection</div></div>
+                <div class="forecast-item"><div class="label">Confidence</div><div class="value">${hasData?Math.min(95,Math.max(40,100-Math.abs(trend))):'—'}%</div><div class="delta trend-neutral">Based on available history</div></div>
+            `;
+        }
+    </script>
+</body>
+</html>

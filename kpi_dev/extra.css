@@ -1,0 +1,46 @@
+        /* Live-sheet controls, quality notices and accessible horizontal charts */
+        .small-eyebrow { font-size:.68rem; font-weight:800; letter-spacing:.13em; color:#94a3b8; }
+        .review-toolbar { display:flex; align-items:end; flex-wrap:wrap; gap:.8rem; margin:0 0 1rem; }
+        .control-group { display:flex; flex-direction:column; gap:.3rem; }
+        .control-group label,.filter-row label { color:#64748b; font-size:.68rem; font-weight:800; letter-spacing:.1em; }
+        select { min-height:42px; min-width:220px; padding:.55rem 2rem .55rem .8rem; background:#fff; color:#0f172a; border:1px solid #cbd5e1; border-radius:.6rem; font:700 .87rem inherit; font-size:.87rem; font-weight:700; }
+        select:focus-visible,button:focus-visible { outline:3px solid #93c5fd; outline-offset:2px; }
+        .refresh-btn { min-height:42px; padding:.55rem 1rem; border-radius:.6rem; border:1px solid #cbd5e1; background:#f8fafc; color:#0f172a; font-size:.86rem; font-weight:800; cursor:pointer; }
+        .refresh-btn:hover { background:#eef2ff; }
+        .refresh-btn:disabled { cursor:wait; opacity:.6; }
+        .sync-note { color:#64748b; font-size:.74rem; font-weight:600; line-height:1.4; padding:.4rem 0; }
+        .quality-note { display:none; padding:.85rem 1rem; background:#fffbeb; border:1px solid #fcd34d; border-radius:.7rem; color:#713f12; font-size:.79rem; font-weight:650; margin:0 0 1.4rem; }
+        .quality-note ul { margin:.25rem 0 0 1.15rem; } .quality-note li + li { margin-top:.3rem; }
+        .section-note { color:#94a3b8; font-size:.76rem; font-weight:700; margin-left:auto; }
+        .bar-list { display:flex; flex-direction:column; gap:.7rem; min-height:7rem; justify-content:center; }
+        .bar-row { display:grid; grid-template-columns:minmax(92px, 145px) minmax(30px,1fr) 72px; gap:.65rem; align-items:center; font-size:.78rem; font-weight:700; }
+        .bar-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#334155; }
+        .bar-track { height:9px; background:#eef2f7; border-radius:99px; overflow:hidden; }
+        .bar-fill { height:100%; border-radius:99px; background:#2563eb; }
+        .bar-fill.xguard { background:#eab308; }
+        .bar-number { text-align:right; color:#0f172a; white-space:nowrap; font-weight:800; }
+        .bar-empty { color:#94a3b8; font-size:.8rem; font-weight:650; padding:1rem 0; }
+        .donut-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:190px; }
+        .mini-note { color:#64748b; font-size:.75rem; line-height:1.5; font-weight:600; margin-top:.7rem; }
+        .methodology { margin:.75rem .1rem 0; }
+        .comparison-note { margin:0 0 1rem; }
+        .emp-card { text-align:left; cursor:pointer; font:inherit; color:inherit; }
+        .emp-card.selected { border:2px solid #2563eb; padding:calc(1.25rem - 1px); }
+        .emp-card.xguard.selected { border-color:#ca8a04; }
+        .emp-stat .num { line-height:1.2; } .emp-stat .lbl { line-height:1.2; }
+        .filter-row { display:flex; flex-wrap:wrap; align-items:center; gap:.65rem; margin:1rem 0; }
+        .filter-row select { min-width:180px; min-height:37px; }
+        .filter-row .mini-note { margin:0; }
+        td { vertical-align:top; overflow-wrap:anywhere; }
+        td.kpi-area { min-width:220px; } td.target-cell { min-width:105px; }
+        td.notes-cell { min-width:105px; max-width:240px; }
+        details summary { color:#1d4ed8; font-weight:800; cursor:pointer; white-space:nowrap; }
+        details .note-text { white-space:pre-wrap; font-size:.76rem; color:#475569; margin-top:.45rem; }
+        .calc-tag,.review-tag { display:inline-block; font-size:.65rem; font-weight:800; color:#64748b; margin-top:.2rem; }
+        .review-tag { color:#b45309; }
+        .ach-muted { background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; }
+        .footer-note { margin-top:2.5rem; padding-top:1rem; border-top:1px solid #e2e8f0; color:#94a3b8; font-size:.72rem; font-weight:600; }
+        .forecast-panel { margin-top:1rem; }
+        .forecast-item .value { overflow-wrap:anywhere; }
+        .tab[hidden] { display:none !important; }
+        @media (max-width:640px) { .section-note { width:100%; margin-left:0; } .review-toolbar { align-items:stretch; } .control-group, .control-group select, .refresh-btn { width:100%; } .sync-note { width:100%; } .bar-row { grid-template-columns:minmax(80px,110px) minmax(25px,1fr) 65px; } }

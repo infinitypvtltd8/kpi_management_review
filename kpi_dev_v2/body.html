@@ -1,0 +1,161 @@
+<div class="page landing active" id="landing">
+  <div class="landing-orb orb-blue"></div><div class="landing-orb orb-gold"></div>
+  <div class="landing-inner">
+    <div class="landing-top">
+      <div class="brand-line"><span class="brand-glyph">◈</span> PERFORMANCE INTELLIGENCE</div>
+      <div class="landing-status" id="landing-status"><span class="status-dot"></span>Connecting to Google Sheet</div>
+    </div>
+    <main class="landing-content">
+      <div class="landing-kicker">Your performance, in focus</div>
+      <h1>KPI - <span>MANAGEMENT REVIEW</span></h1>
+      <p class="landing-copy">A clearer view of the people, departments and work driving your business. Choose a company to explore its live performance.</p>
+      <div class="choice-heading">Select your company</div>
+      <div class="choices">
+        <button class="choice-card apeiro" aria-label="APEIRO" onclick="openCompany('apeiro')">
+          <span class="choice-logo"><img data-logo="apeiro" alt="APEIRO logo"></span>
+          <span class="choice-body"><span class="choice-overline">Company 01</span><strong>APEIRO</strong><p>Operations, projects &amp; individual performance</p><span class="choice-link">Explore dashboard <span aria-hidden="true">↗</span></span></span><span class="choice-arrow" aria-hidden="true">↗</span>
+        </button>
+        <button class="choice-card xguard" aria-label="X GUARD" onclick="openCompany('xguard')">
+          <span class="choice-logo dark"><img data-logo="xguard" alt="X GUARD logo"></span>
+          <span class="choice-body"><span class="choice-overline">Company 02</span><strong>X GUARD</strong><p>Department, unit &amp; executive officer reviews</p><span class="choice-link">Explore dashboard <span aria-hidden="true">↗</span></span></span><span class="choice-arrow" aria-hidden="true">↗</span>
+        </button>
+      </div>
+    </main>
+    <div class="landing-foot"><span>◈ &nbsp; KPI MANAGEMENT REVIEW</span><span>LIVE SHEET DATA &nbsp; · &nbsp; PEOPLE &nbsp; · &nbsp; PERFORMANCE</span></div>
+  </div>
+</div>
+
+<div class="page app-page" id="company-page">
+  <header class="topbar"><div class="topbar-inner">
+    <button class="home-btn" onclick="goHome()" aria-label="Back to company selection">←</button>
+    <div class="company-lockup"><img id="company-logo" class="company-logo" alt="Company logo"><div class="lockup-copy"><small>Management review</small><strong id="top-company">X GUARD</strong></div></div>
+    <div class="topbar-spacer"></div><div class="topbar-indicator" id="topbar-status">Checking sheet…</div>
+    <button class="ghost-btn" id="switch-company" onclick="switchCompany()">Switch company ↗</button>
+    <button class="report-launch" onclick="showTab('reports')" aria-label="Open report center">▤ <span>Reports</span></button>
+    <button class="icon-btn" id="refresh-btn" onclick="refreshSheet()"><span class="rotate">↻</span> Refresh</button>
+  </div></header>
+  <main class="app-shell">
+    <div class="title-row"><div><div class="eyebrow">Company performance / management intelligence</div><h1><span id="heading-company">X GUARD</span> performance<span>.</span></h1><p id="company-subtitle">A live view of your teams, targets and trends.</p></div><div class="title-meta"><strong>MANAGEMENT REVIEW</strong><br><span id="title-period">Reporting period</span></div></div>
+    <div class="source-banner" id="source-banner" role="status" aria-live="polite"><div class="source-copy"><span class="source-lamp"></span><span id="source-text">Connecting to Google Sheet…</span></div><button onclick="showTab('quality')">Data health ↗</button></div>
+    <div class="filter-bar">
+      <div class="filter-field"><label for="period-select">Reporting period</label><select id="period-select" onchange="changePeriod(this.value)"><option>Loading…</option></select></div>
+      <div class="filter-field" id="dept-filter-field"><label for="dept-select">Department / ownership</label><select id="dept-select" onchange="changeDepartment(this.value)"></select></div>
+      <div class="filter-field"><label for="person-select">Employee</label><select id="person-select" onchange="changePerson(this.value)"></select></div>
+      <button class="filter-reset" onclick="resetFilters()">Clear filters</button>
+    </div>
+    <div class="filter-meta" id="scope-label">Showing all available records for the selected period.</div>
+    <div class="quality-strip" id="quality-strip"></div>
+    <nav class="tabs" aria-label="Dashboard sections">
+      <button class="tab active" data-tab="overview" onclick="showTab('overview')"><span class="tab-icon">◫</span> Overview</button>
+      <button class="tab" data-tab="people" onclick="showTab('people')"><span class="tab-icon">◉</span> People</button>
+      <button class="tab" data-tab="departments" id="department-tab" onclick="showTab('departments')"><span class="tab-icon">▦</span> Departments</button>
+      <button class="tab" data-tab="units" onclick="showTab('units')"><span class="tab-icon">⬡</span> Units &amp; workstreams</button>
+      <button class="tab" data-tab="subsidiaries" onclick="showTab('subsidiaries')"><span class="tab-icon">◈</span> Subsidiaries</button>
+      <button class="tab" data-tab="reports" onclick="showTab('reports')"><span class="tab-icon">▤</span> Reports</button>
+      <button class="tab" data-tab="quality" onclick="showTab('quality')"><span class="tab-icon">◇</span> Data health</button>
+    </nav>
+    <div class="scroll-hint" aria-hidden="true">Swipe to explore more views →</div>
+
+    <section class="view active" id="view-overview">
+      <div class="view-header"><div><div class="eyebrow">01 / Executive overview</div><h2>Performance at a glance</h2><p>Live reporting for the current selection.</p></div><div class="view-tools"><button class="small-action" onclick="showTab('people')">Explore KPI records ↗</button><button class="small-action report-overview-link" onclick="showTab('reports')">▤ All reports &amp; downloads</button><button class="small-action" onclick="window.print()">Print / save PDF</button></div></div>
+      <div class="stats-grid" id="executive-cards"></div>
+      <div class="analytics-grid section-gap">
+        <article class="card span-8"><div class="card-top"><div><h3>Performance over time</h3><p>Unweighted average of available reported percentages and calculated ratios.</p></div><span class="card-badge">Monthly trend</span></div><div class="chart-box" id="overview-trend"></div><p class="chart-note">The people and KPIs represented can change between months. Missing values are not plotted as zero.</p></article>
+        <article class="card span-4"><div class="card-top"><div><h3>KPI assessment</h3><p>Met vs not met, among assessable records.</p></div><span class="card-badge">Status</span></div><div id="overview-donut"></div></article>
+        <article class="card span-6"><div class="card-top"><div><h3>Recorded % by employee</h3><p>Available numeric results only; status-only records do not create a percentage.</p></div><span class="card-badge">People</span></div><div class="chart-box" id="overview-person-bars"></div></article>
+        <article class="card span-6"><div class="card-top"><div><h3>Assessment coverage</h3><p>How many KPI records can be assessed for each person.</p></div><span class="card-badge">Coverage</span></div><div class="chart-box" id="overview-coverage"></div></article>
+      </div>
+      <div class="analytics-grid section-gap">
+        <article class="card span-6"><div class="card-top"><div><h3>Attention required</h3><p>Not-met records reported or calculated from comparable values.</p></div><span class="card-badge">Action list</span></div><div id="overview-attention"></div></article>
+        <article class="card span-6"><div class="card-top"><div><h3>Period movement</h3><p>Changes for the same employee and KPI only.</p></div><span class="card-badge">Matched KPIs</span></div><div id="overview-movement"></div></article>
+        <article class="card span-12"><div class="card-top"><div><h3>Indicative next-period projection</h3><p>A simple extrapolation based only on matched KPI pairs.</p></div><span class="card-badge">Illustrative</span></div><div class="forecast-grid" id="overview-forecast"></div><p class="fine-note">This is not a prediction or confidence estimate. At least three comparable KPIs across consecutive months are required.</p></article>
+      </div>
+      <p class="fine-note">Recorded % combines available source percentages and comparable actual/target ratios. The underlying KPIs have different meanings, so company and group averages are indicative rather than like-for-like rankings.</p>
+    </section>
+
+    <section class="view" id="view-people">
+      <div class="view-header"><div><div class="eyebrow">02 / Individual review</div><h2>People &amp; KPI detail</h2><p>Choose an employee to review their measures and history.</p></div><div class="view-tools"><button class="small-action" id="csv-button" onclick="exportCsv()">↓ Export shown records (CSV)</button><button class="small-action" onclick="window.print()">Print / save PDF</button></div></div>
+      <div class="people-grid" id="people-cards"></div>
+      <div class="analytics-grid section-gap">
+        <article class="card span-7"><div class="card-top"><div><h3>Performance history</h3><p id="people-trend-subtitle">Use the employee filter to review one person.</p></div><span class="card-badge">Recorded %</span></div><div id="people-trend"></div></article>
+        <article class="card span-5"><div class="card-top"><div><h3>Result mix</h3><p>Reported % values across this selection.</p></div><span class="card-badge">Distribution</span></div><div id="people-distribution"></div><p class="chart-note">Distribution is based on numeric values only, not on status-only records.</p></article>
+      </div>
+      <div class="card section-gap"><div class="card-top"><div><h3>Individual KPI records</h3><p>Target, result, source status and notes for the selected month.</p></div><span class="card-badge">Detailed review</span></div>
+        <div class="table-controls"><div class="table-field search"><label for="kpi-search">Search records</label><input id="kpi-search" type="search" placeholder="Search KPI, person or notes" oninput="changeSearch(this.value)"></div><div class="table-field"><label for="status-select">KPI status</label><select id="status-select" onchange="changeTableStatus(this.value)"><option value="all">All statuses</option><option value="met">Met</option><option value="not-met">Not met</option><option value="unknown">Not assessed</option><option value="review">Needs review</option></select></div><div class="table-count" id="table-count"></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Employee / unit</th><th>KPI area</th><th>Target</th><th>Actual / result</th><th>Recorded %</th><th>Vs previous</th><th>Status</th><th>Notes</th></tr></thead><tbody id="kpi-table-body"></tbody></table></div>
+        <p class="fine-note">“Calculated” status assumes higher numeric actual is better. A dash means there is not enough information. Duplicate month sections and conflicting results are marked for review.</p>
+      </div>
+    </section>
+
+    <section class="view" id="view-departments">
+      <div class="view-header"><div><div class="eyebrow">03 / Departmental review</div><h2>Departments</h2><p>Department performance, ownership, coverage and history.</p></div><div class="view-tools"><button class="small-action" onclick="window.print()">Print / save PDF</button></div></div>
+      <div class="callout gold">The department KPI view uses single ownership to avoid double counting: Uthpala’s recruitment KPIs are assigned to HR &amp; Recruitment; Nimmi’s cross-department leadership KPIs are shown separately. Department rosters may overlap. A dash means no usable numeric percentage, not zero; status-only results still appear in the status chart.</div>
+      <div class="review-grid section-gap" id="department-cards"></div>
+      <div class="analytics-grid section-gap">
+        <article class="card span-6"><div class="card-top"><div><h3>Department recorded %</h3><p>Average of available numeric KPI results.</p></div><span class="card-badge">Comparison</span></div><div id="department-bars"></div></article>
+        <article class="card span-6"><div class="card-top"><div><h3>Department status mix</h3><p>Met, not met and unassessed KPI records.</p></div><span class="card-badge">Status</span></div><div id="department-status"></div></article>
+        <article class="card span-12"><div class="card-top"><div><h3>Department performance by month</h3><p>Average recorded % by KPI ownership; “—” indicates no usable numeric results.</p></div><span class="card-badge">Heatmap</span></div><div class="matrix-wrap" id="department-heatmap"></div><p class="chart-note">Month labels may lack a year. The team and KPI mix can differ by month.</p></article>
+      </div>
+      <div class="card section-gap"><div class="card-top"><div><h3>Department review table</h3><p>Roster membership is separate from KPI ownership.</p></div><span class="card-badge">Summary</span></div><div class="table-wrap"><table><thead><tr><th>Department</th><th>Department head</th><th>Team members</th><th>KPI records</th><th>Recorded %</th><th>Met / assessed</th><th>Unassessed</th></tr></thead><tbody id="department-table"></tbody></table></div></div>
+    </section>
+
+    <section class="view" id="view-units">
+      <div class="view-header"><div><div class="eyebrow">04 / Unit performance</div><h2>Units &amp; workstreams</h2><p>Explore role-based groups, trends and the themes in their KPIs.</p></div><div class="unit-toolbar"><label for="unit-select" class="eyebrow">Review group</label><select class="unit-select" id="unit-select" onchange="changeUnit(this.value)"></select></div></div>
+      <div class="callout" id="unit-note">These review groups are based on the roles and department structure provided, not on a unit column in the Sheet. Work themes are inferred from KPI titles and should be verified. Selecting a group updates its history, assessment, themes and table; the comparison bars show all groups in the current filters.</div>
+      <div class="review-grid section-gap" id="unit-cards"></div>
+      <div class="analytics-grid section-gap">
+        <article class="card span-7"><div class="card-top"><div><h3>Unit performance history</h3><p id="unit-trend-subtitle">Choose a group to explore its trend.</p></div><span class="card-badge">Trend</span></div><div id="unit-trend"></div></article>
+        <article class="card span-5"><div class="card-top"><div><h3>Unit assessment</h3><p>Results for the selected review group.</p></div><span class="card-badge">Coverage</span></div><div id="unit-donut"></div></article>
+        <article class="card span-6"><div class="card-top"><div><h3>Group recorded %</h3><p>Compare role-based review groups.</p></div><span class="card-badge">Groups</span></div><div id="unit-bars"></div></article>
+        <article class="card span-6"><div class="card-top"><div><h3>Work themes</h3><p>Keyword groups inferred from KPI titles. Not official unit allocations.</p></div><span class="card-badge">KPI themes</span></div><div id="unit-themes"></div></article>
+      </div>
+      <div class="card section-gap"><div class="card-top"><div><h3>Unit review table</h3><p>Each KPI belongs to one role-based group.</p></div><span class="card-badge">Summary</span></div><div class="table-wrap"><table><thead><tr><th>Review group</th><th>Department</th><th>People</th><th>KPI records</th><th>Recorded %</th><th>Met / assessed</th><th>Unassessed</th></tr></thead><tbody id="unit-table"></tbody></table></div></div>
+    </section>
+
+    <section class="view" id="view-subsidiaries">
+      <div class="view-header"><div><div class="eyebrow">05 / Group perspective</div><h2>Subsidiary comparison</h2><p>X GUARD → APEIRO · same selected period.</p></div><div class="view-tools"><button class="small-action" onclick="window.print()">Print / save PDF</button></div></div>
+      <div class="callout">This view compares whole companies and ignores the department and employee filters. KPI definitions, coverage and sample sizes differ; the averages are not a like-for-like ranking.</div>
+      <div class="analytics-grid section-gap"><article class="card span-6" id="compare-apeiro"></article><article class="card span-6" id="compare-xguard"></article>
+        <article class="card span-8"><div class="card-top"><div><h3>Company trends</h3><p>Historical averages for available numeric results.</p></div><span class="card-badge">Monthly</span></div><div id="compare-trend"></div><p class="chart-note">If a period has no usable numeric values it is not plotted. People and KPIs represented may vary.</p></article>
+        <article class="card span-4"><div class="card-top"><div><h3>Assessment rates</h3><p>Met among assessable KPI records.</p></div><span class="card-badge">Selected period</span></div><div id="compare-status"></div></article>
+      </div>
+      <div class="card section-gap"><div class="card-top"><div><h3>Company review table</h3><p>Coverage is shown alongside the metrics.</p></div><span class="card-badge">Group summary</span></div><div class="table-wrap"><table><thead><tr><th>Company</th><th>Employees with records</th><th>KPI records</th><th>Numeric results</th><th>Recorded %</th><th>Met / assessed</th><th>Unassessed</th></tr></thead><tbody id="compare-table"></tbody></table></div></div>
+    </section>
+
+    <section class="view" id="view-reports">
+      <div class="view-header"><div><div class="eyebrow">06 / Reporting center</div><h2>Reports &amp; downloads</h2><p>Turn the available Sheet data into useful reviews, ready to share.</p></div><div class="view-tools"><button class="small-action" onclick="showTab('quality')">Review data health ↗</button></div></div>
+      <div class="report-studio">
+        <div class="report-studio-top">
+          <div class="report-studio-copy"><span class="report-live-tag"><i></i> SHEET-POWERED REPORTS</span><h3>Every perspective.<br><span>One report pack.</span></h3><p>Choose your scope and period, preview any report, or download the complete collection with an Excel workbook and individual CSVs.</p></div>
+          <div class="report-downloads"><button class="report-primary" id="report-zip-button" onclick="downloadReportPack()"><span aria-hidden="true">↓</span> Download all reports <small>ZIP · Excel + CSV</small></button><button class="report-secondary" id="report-xlsx-button" onclick="downloadReportWorkbook()">Download Excel workbook</button><span class="report-download-note">Generated in your browser from the latest available data.</span></div>
+        </div>
+        <div class="report-controls">
+          <label for="report-scope"><span>01 &nbsp; Report coverage</span><select id="report-scope" onchange="setReportScope(this.value)"><option value="current">Current company &amp; filters</option><option value="group">Both companies · whole group</option></select></label>
+          <label for="report-range"><span>02 &nbsp; Reporting period</span><select id="report-range" onchange="setReportRange(this.value)"><option value="selected">Selected reporting period</option><option value="all">All available months</option></select></label>
+          <div class="report-scope-current"><span>YOUR REPORT SELECTION</span><strong id="report-scope-line">—</strong><small id="report-scope-detail">—</small></div>
+        </div>
+      </div>
+      <div class="report-status" id="report-status" role="status" aria-live="polite"></div>
+      <div class="report-metrics" id="report-metrics"></div>
+      <div class="report-section-head"><div><div class="eyebrow">REPORT LIBRARY</div><h3>Select a report to preview</h3><p>Every report is included in the ZIP and Excel workbook. Single-report CSVs are available below.</p></div><span class="report-count" id="report-count">—</span></div>
+      <div class="report-grid" id="report-grid"></div>
+      <div class="card section-gap report-preview" id="report-preview">
+        <div class="card-top report-preview-top"><div><div class="eyebrow">SELECTED REPORT</div><h3 id="report-preview-title">Executive summary</h3><p id="report-preview-description"></p></div><div class="view-tools"><button class="small-action" id="report-csv-button" onclick="downloadSelectedReport()">↓ Download CSV</button><button class="small-action" id="report-print-button" onclick="printSelectedReport()">Print full report / PDF</button></div></div>
+        <div class="report-preview-meta" id="report-preview-meta"></div>
+        <div class="table-wrap report-table-wrap"><table id="report-preview-table"><thead id="report-table-head"></thead><tbody id="report-table-body"></tbody></table></div>
+        <p class="fine-note" id="report-preview-note"></p>
+      </div>
+    </section>
+
+    <section class="view" id="view-quality">
+      <div class="view-header"><div><div class="eyebrow">07 / Source &amp; quality</div><h2>Data health</h2><p>Connection status and important checks before interpreting the charts.</p></div><div class="view-tools"><button class="small-action" onclick="refreshSheet()">↻ Refresh Google Sheet</button></div></div>
+      <div class="analytics-grid"><article class="card span-12"><div class="card-top"><div><h3>Employee tab connections</h3><p>Each tab is checked on open, on refresh and every five minutes while the page is visible.</p></div><span class="card-badge" id="health-time">Not checked yet</span></div><div class="source-grid" id="health-sources"></div></article>
+        <article class="card span-6"><div class="card-top"><div><h3>Review flags</h3><p>Problems found in the currently selected period and filters.</p></div><span class="card-badge">Quality</span></div><div id="health-issues"></div></article>
+        <article class="card span-6"><div class="card-top"><div><h3>How to read this dashboard</h3><p>Definitions and limits for your management review.</p></div><span class="card-badge">Methodology</span></div><div id="health-method"></div></article>
+      </div>
+    </section>
+    <footer class="footer"><strong>Source:</strong> publicly published Google Sheet. No password or access token is stored in this app. The Sheet and any public hosting can expose employee and financial data; use authenticated hosting and a private data source for confidential reporting.</footer>
+  </main>
+</div>
+
+<div class="report-print-sheet" id="report-print-sheet" aria-hidden="true"></div>

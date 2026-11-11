@@ -1,0 +1,79 @@
+    <!-- ================= COMPANY PAGE ================= -->
+    <div class="page" id="company-page">
+        <div class="company-shell">
+            <nav class="nav-bar">
+                <button class="back-btn" onclick="goHome()">&#8592; Back to Review</button>
+                <span class="small-eyebrow">MANAGEMENT REVIEW / <span id="nav-company">APEIRO</span></span>
+            </nav>
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title" id="company-name">APEIRO</h1>
+                    <span class="company-tag tag-apeiro" id="company-tag">Operations</span>
+                </div>
+            </div>
+            <p class="page-subtitle" id="company-subtitle">KPI Management Review</p>
+            <div class="divider"></div>
+
+            <div class="data-banner" id="data-banner" role="status" aria-live="polite">
+                <span class="dot"></span><span id="data-banner-text">Connecting to the published Google Sheet...</span>
+            </div>
+            <div class="review-toolbar">
+                <div class="control-group"><label for="period-select">REPORTING MONTH</label><select id="period-select" onchange="changePeriod(this.value)"><option>Loading…</option></select></div>
+                <button class="refresh-btn" id="refresh-btn" onclick="refreshSheet()">&#8635; Refresh Google Sheet</button>
+                <div class="sync-note" id="last-checked">Updates when opened and every 5 minutes while open.</div>
+            </div>
+            <div class="quality-note" id="quality-note"></div>
+
+            <div class="section"><div class="kpi-grid" id="exec-scorecards"></div></div>
+            <div class="section">
+                <div class="section-header"><h2 class="section-title"><span class="dot"></span> Performance overview</h2><span class="section-note">Selected month · available records only</span></div>
+                <div class="chart-grid chart-grid-2">
+                    <div class="chart-card"><h4>Average recorded % by employee</h4><div class="bar-list" id="css-emp-bar"></div></div>
+                    <div class="chart-card"><h4>Assessable KPI status</h4><div class="donut-wrap"><div class="css-doughnut" id="css-doughnut"><div class="css-doughnut-text"><span class="css-doughnut-num" id="doughnut-num">—</span><span class="css-doughnut-lbl" id="doughnut-lbl">no assessment</span></div></div><p class="mini-note" id="status-coverage"></p></div></div>
+                </div>
+                <p class="mini-note methodology">Percentages are an unweighted average of available recorded percentages and, where appropriate, actual/target ratios. KPIs differ in meaning; compare with care. Status is shown only when reported or calculable from comparable numeric values.</p>
+            </div>
+            <div class="section">
+                <div class="section-header"><h2 class="section-title"><span class="dot"></span> History &amp; indicative forecast</h2></div>
+                <div class="chart-grid chart-grid-2">
+                    <div class="chart-card"><h4>Recorded % by month</h4><div class="bar-list" id="css-trend"></div><p class="mini-note">The employees and KPIs represented can change between months.</p></div>
+                    <div class="chart-card"><h4>Records by employee</h4><div class="bar-list" id="css-variance"></div><p class="mini-note">A missing month is not treated as zero.</p></div>
+                </div>
+                <div class="forecast-panel" id="forecast-panel"></div>
+                <p class="mini-note">Forecast is a simple next-period extrapolation of matched employee/KPI pairs. It is illustrative only, not a reliable prediction or confidence estimate.</p>
+            </div>
+            <div class="tabs">
+                <button class="tab active" id="individual-tab" onclick="switchTab(this,'individual')">Individual KPIs</button>
+                <button class="tab" id="department-tab" onclick="switchTab(this,'department')">Departmental Breakdown</button>
+                <button class="tab" id="subsidiary-tab" onclick="switchTab(this,'subsidiary')">Subsidiary View</button>
+            </div>
+            <div class="tab-panel active" id="tab-individual">
+                <div class="emp-grid" id="emp-leaderboard"></div>
+                <div class="filter-row"><label for="employee-filter">Show employee</label><select id="employee-filter" onchange="changeEmployee(this.value)"></select><span class="mini-note">Select a card or use this filter to see individual records.</span></div>
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Employee</th><th>Department</th><th>KPI area</th><th>Target</th><th>Actual / result</th><th>Recorded %</th><th>Vs previous</th><th>Status</th><th>Notes</th></tr></thead>
+                    <tbody id="kpi-table-body"></tbody>
+                </table></div>
+                <p class="mini-note">“Calculated” status assumes a higher numeric actual is better. A dash means the sheet did not provide enough information. Conflicting percentages and duplicate month sections are marked for review.</p>
+            </div>
+            <div class="tab-panel" id="tab-department">
+                <div class="chart-grid chart-grid-2">
+                    <div class="chart-card"><h4>Department recorded %</h4><div class="bar-list" id="css-dept"></div></div>
+                    <div class="chart-card"><h4>Assessed KPIs met</h4><div class="bar-list" id="css-dept-met"></div></div>
+                </div>
+                <div class="dept-grid" id="dept-cards"></div>
+                <p class="mini-note">Uthpala is listed in Admin and HR &amp; Recruitment; the recruitment KPIs are counted under HR &amp; Recruitment only. Nimmi’s cross-department leadership KPIs appear individually, not in each department’s totals. Department memberships can overlap.</p>
+                <div class="table-wrap"><table>
+                    <thead><tr><th>Department</th><th>Team members</th><th>Head</th><th>Recorded %</th><th>Met / assessed</th><th>Records</th></tr></thead>
+                    <tbody id="dept-table-body"></tbody>
+                </table></div>
+            </div>
+            <div class="tab-panel" id="tab-subsidiary">
+                <div class="section-header"><h2 class="section-title"><span class="dot dot-xguard"></span> Subsidiary comparison: X GUARD &rarr; APEIRO</h2></div>
+                <p class="mini-note comparison-note">Same selected month; missing people are excluded. Companies use different KPIs, so these indicative averages are not a like-for-like ranking.</p>
+                <div class="sub-matrix" id="subsidiary-matrix"></div>
+                <div class="chart-card" style="margin-top:1rem;"><h4>Average recorded %</h4><div class="bar-list" id="css-subsidiary"></div></div>
+            </div>
+            <p class="footer-note">Data source: publicly published Google Sheet. This dashboard does not require or store a Google password or access token.</p>
+        </div>
+    </div>
